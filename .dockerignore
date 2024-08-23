@@ -1,0 +1,7 @@
+.venv/
+.idea/
+Dockerfile
+*__pycache__*
+.git/
+.github/
+media/

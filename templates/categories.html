@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f8f9;
+        }
+
+
+        .catalog {
+            padding: 20px;
+        }
+
+        .catalog-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-text {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<section class="catalog">
+    {% for i in qs %}
+        <div class="catalog-item" onclick="get_subcategories({{ i.id }}, '{{ i.name }}')">
+            <span class="item-text">{{ i.name }}</span>
+            <img src="{{ i.icon.url }}" alt="{{ i.name }} icon" class="item-icon">
+        </div>
+    {% endfor %}
+</section>
+</body>
+<script>
+    function get_subcategories(pk, name) {
+        window.location.href = `/api/v1/products/${pk}/?name=${name}&lang={{ lang }}&chat_id={{ chat_id }}`
+    }
+</script>
+</html>

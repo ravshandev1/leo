@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7f8;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 10px 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .back-header {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .back-button {
+            font-size: 20px;
+            color: #333;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+            color: #333;
+        }
+
+        .product-list {
+            margin: 15px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+
+        .product-details {
+            flex-grow: 1;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .product-bonus {
+            font-size: 12px;
+            color: green;
+        }
+
+        .product-price {
+            font-size: 14px;
+            color: #555;
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="back-header">
+        <span onclick="back()" class="back-button">&#x2190;</span>
+        <h2>{{ cat_name }}</h2>
+    </div>
+</header>
+
+<section class="product-list">
+    {% for i in qs %}
+        <div class="product-item" onclick="get_product({{ i.id }})">
+            <img src="{{ i.image.image.url }}" alt="img">
+            <div class="product-details">
+                <span class="product-name">{{ i.name }}</span>
+                <span class="product-bonus">Bonus <strong>{{ i.bonus }}</strong> ball</span>
+                <span class="product-price">Narxi <strong>{{ i.price }}</strong> ball</span>
+            </div>
+        </div>
+    {% endfor %}
+</section>
+</body>
+<script>
+    function back() {
+        window.history.back();
+    }
+
+    function get_product(pk, name) {
+        window.location.href = `/api/v1/${pk}/?name=${name}&lang={{ lang }}&chat_id={{ chat_id }}`
+    }
+</script>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .order-page-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .carousel-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .carousel-images {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-images img {
+            width: 100%;
+            margin-right: 20px;
+            flex-shrink: 0;
+            border-radius: 10px;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .carousel-button.prev {
+            left: 10px;
+        }
+
+        .carousel-button.next {
+            right: 10px;
+        }
+
+        .product-details {
+            text-align: center;
+        }
+
+        .product-price {
+            font-size: 24px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quantity-button {
+            background-color: #d1d1d1;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+
+        .total-price {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .insufficient-points-message {
+            font-size: 16px;
+            color: red;
+            margin-bottom: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        .add-to-cart-button {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            cursor: not-allowed;
+        }
+
+        .add-to-cart-button[disabled] {
+            background-color: #d1d1d1;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="back-header">
+        <span onclick="back()" class="back-button">&#x2190;</span>
+    </div>
+</header>
+
+<div class="order-page-container">
+        <!-- Product Image Carousel -->
+        <div class="carousel-container">
+            <button class="carousel-button prev">‹</button>
+            <div class="carousel-wrapper">
+                <div class="carousel-images">
+                    {% for i in obj.images %}
+                        <img src="{{ i.image.url }}" alt="Product image {{ i.id }}" class="product-image">
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="carousel-button next">›</button>
+        </div>
+
+        <!-- Product Details -->
+        <div class="product-details">
+            <h1>{{ obj.name }}</h1>
+            <p class="product-price">{{ obj.price }} ball</p>
+            <p class="product-description">{{ obj.description }}</p>
+
+            <!-- Quantity Selector -->
+            <div class="quantity-selector">
+                <button class="quantity-button minus-button">-</button>
+                <input type="text" value="1" class="quantity-input">
+                <button class="quantity-button plus-button">+</button>
+            </div>
+
+            <!-- Total Price -->
+            <div class="total-price">
+                <span>Jami:</span>
+                <strong>{{ obj.price }}</strong> ball
+            </div>
+
+            <!-- Insufficient Points Message -->
+            <p class="insufficient-points-message">Sizda ball yetarli emas</p>
+
+            <!-- Add to Cart Button -->
+            <button class="add-to-cart-button" disabled>Buyurtma berish</button>
+        </div>
+    </div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const quantityInput = document.querySelector('.quantity-input');
+        const minusButton = document.querySelector('.minus-button');
+        const plusButton = document.querySelector('.plus-button');
+        const totalPriceElement = document.querySelector('.total-price strong');
+        const basePrice = parseInt(totalPriceElement.textContent.replace(/\D/g, ''));
+        const addToCartButton = document.querySelector('.add-to-cart-button');
+        const insufficientPointsMessage = document.querySelector('.insufficient-points-message');
+        const userPoints = parseInt({{ point }}); // Example: User's available points
+
+        // Update total price and check points
+        function updateTotalPrice() {
+            const quantity = parseInt(quantityInput.value);
+            const newTotalPrice = basePrice * quantity;
+            totalPriceElement.textContent = newTotalPrice.toLocaleString() + " ball";
+
+            if (newTotalPrice > userPoints) {
+                addToCartButton.disabled = true;
+                insufficientPointsMessage.style.display = 'block';
+            } else {
+                addToCartButton.disabled = false;
+                insufficientPointsMessage.style.display = 'none';
+            }
+        }
+
+        // Handle minus button click
+        minusButton.addEventListener('click', function () {
+            let quantity = parseInt(quantityInput.value);
+            if (quantity > 1) {
+                quantity--;
+                quantityInput.value = quantity;
+                updateTotalPrice();
+            }
+        });
+
+        // Handle plus button click
+        plusButton.addEventListener('click', function () {
+            let quantity = parseInt(quantityInput.value);
+            quantity++;
+            quantityInput.value = quantity;
+            updateTotalPrice();
+        });
+
+        // Initialize carousel
+        const carouselImages = document.querySelector('.carousel-images');
+        const prevButton = document.querySelector('.carousel-button.prev');
+        const nextButton = document.querySelector('.carousel-button.next');
+        const images = document.querySelectorAll('.carousel-images img');
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            const totalImages = images.length;
+            if (index >= totalImages) {
+                currentIndex = 0;
+            } else if (index < 0) {
+                currentIndex = totalImages - 1;
+            } else {
+                currentIndex = index;
+            }
+            const offset = -currentIndex * 100;
+            carouselImages.style.transform = `translateX(${offset}%)`;
+        }
+
+        prevButton.addEventListener('click', function () {
+            showSlide(currentIndex - 1);
+        });
+
+        nextButton.addEventListener('click', function () {
+            showSlide(currentIndex + 1);
+        });
+
+        // Initialize total price and points check
+        updateTotalPrice();
+    });
+
+
+    function back() {
+        window.history.back();
+    }
+
+
+</script>
+</html>
