@@ -8,4 +8,4 @@ ADD . .
 RUN sed -i 's/^DEBUG=.*/DEBUG="0"/' .env
 EXPOSE 8000
 RUN python manage.py migrate
-CMD ["python", "manage.oy", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
