@@ -1,7 +1,7 @@
 from rest_framework import generics, response
 from .serializers import RegionSerializer, TelegramUserSerializer, UserSerializer, UserPointSerializer, PhoneSerializer, \
-    VerifyPhoneSerializer, StoreSerializer
-from .models import TelegramUser, Region, Bonus, UserPoint, VerifyPhone, Store
+    VerifyPhoneSerializer, InfoSerializer
+from .models import TelegramUser, Region, Bonus, UserPoint, VerifyPhone, Info
 from .utils import send_verification_code
 from random import randint
 
@@ -11,12 +11,13 @@ class RegionListView(generics.ListAPIView):
     queryset = Region.objects.all()
 
 
-class StoreListView(generics.ListAPIView):
-    serializer_class = StoreSerializer
+class InfoView(generics.GenericAPIView):
+    serializer_class = InfoSerializer
 
-    def get_queryset(self):
-        user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
-        return Store.objects.filter(region__id=user.region.id)
+    def get(self, request, *args, **kwargs):
+        obj = Info.objects.first()
+        serializer = InfoSerializer(obj)
+        return response.Response(serializer.data)
 
 
 class CheckCodeView(generics.GenericAPIView):
@@ -48,7 +49,7 @@ class SendCodeView(generics.GenericAPIView):
     serializer_class = PhoneSerializer
 
     def post(self, request, *args, **kwargs):
-        # code = str(randint(10000, 99999))
+        code = str(randint(10000, 99999))
         code = "77777"
         phone = self.request.data['phone']
         send_verification_code(phone, code)

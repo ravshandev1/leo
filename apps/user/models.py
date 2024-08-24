@@ -8,6 +8,21 @@ class Region(models.Model):
         return self.name
 
 
+class Info(models.Model):
+    link = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.link
+
+
+class InfoPhone(models.Model):
+    info = models.ForeignKey(Info, models.CASCADE, 'phones')
+    phone = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.phone
+
+
 class Store(models.Model):
     name = models.CharField(max_length=100)
     region = models.ForeignKey(Region, models.CASCADE, 'stores')
@@ -21,7 +36,7 @@ class Store(models.Model):
 
 
 class StorePhone(models.Model):
-    phone = models.CharField(max_length=12)
+    phone = models.CharField(max_length=100)
     store = models.ForeignKey(Store, models.CASCADE, 'phones')
 
     def __str__(self):
@@ -31,7 +46,7 @@ class StorePhone(models.Model):
 class TelegramUser(models.Model):
     name = models.CharField(max_length=120)
     chat_id = models.BigIntegerField(unique=True)
-    phone = models.CharField(max_length=13)
+    phone = models.CharField(max_length=100)
     region = models.ForeignKey(Region, models.SET_NULL, null=True, blank=True)
     lang = models.CharField(max_length=2)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -45,7 +60,7 @@ class TelegramUser(models.Model):
 
 
 class VerifyPhone(models.Model):
-    phone = models.CharField(max_length=13)
+    phone = models.CharField(max_length=100)
     code = models.CharField(max_length=5)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -54,7 +69,7 @@ class VerifyPhone(models.Model):
 
 
 class Bonus(models.Model):
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=100, unique=True)
     point = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 

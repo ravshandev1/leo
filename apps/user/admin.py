@@ -1,6 +1,16 @@
 from django.contrib import admin
-from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, Bonus
+from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, Bonus, InfoPhone, Info
 from .translations import CustomAdmin
+
+
+class InfoPhoneInline(admin.StackedInline):
+    model = InfoPhone
+    extra = 0
+
+
+@admin.register(Info)
+class InfoAdmin(admin.ModelAdmin):
+    inlines = [InfoPhoneInline]
 
 
 @admin.register(Region)
