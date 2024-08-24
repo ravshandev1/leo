@@ -21,7 +21,7 @@ ALLOWED_HOSTS = ['*']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
 # Application definition
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
+CSRF_TRUSTED_ORIGINS = ['https://leo.ravshandev.uz']
 CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'modeltranslation',
