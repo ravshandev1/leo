@@ -24,7 +24,7 @@ class CheckCodeView(generics.GenericAPIView):
     serializer_class = UserPointSerializer
 
     def get(self, request, *args, **kwargs):
-        if not Bonus.objects.exists(code=kwargs['code']):
+        if not Bonus.objects.filter(code=kwargs['code']).first():
             return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!", "message_ru": ""},
                                      status=404)
         if UserPoint.objects.exists(bonus__code=kwargs['code']):
