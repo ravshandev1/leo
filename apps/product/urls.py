@@ -5,5 +5,5 @@ urlpatterns = [
     path('', categories_view, name='categories'),
     path('products/<int:cat_id>/', products_view, name='products'),
     path('<int:pk>/', product_detail_view, name='product-detail'),
-    path('order/', order_view, name='order'),
+    path('order/<int:pk>/', order_view, name='order'),
 ]

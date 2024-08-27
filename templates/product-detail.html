@@ -169,18 +169,18 @@
                 <input type="text" value="1" class="quantity-input">
                 <button class="quantity-button plus-button">+</button>
             </div>
-
+            <h2>Sizda mavjud: {{ point }}</h2>
             <!-- Total Price -->
             <div class="total-price">
                 <span>Jami:</span>
-                <strong>{{ obj.price }}</strong> ball
+                <strong>{{ obj.price }}</strong>
             </div>
 
             <!-- Insufficient Points Message -->
-            <p class="insufficient-points-message">Sizda ball yetarli emas</p>
+            <p class="insufficient-points-message">{{ you_cant }}</p>
 
             <!-- Add to Cart Button -->
-            <button class="add-to-cart-button" disabled>Buyurtma berish</button>
+            <button class="add-to-cart-button" disabled>{{ order_btn }}</button>
         </div>
     </div>
 </body>
@@ -209,6 +209,10 @@
                 insufficientPointsMessage.style.display = 'none';
             }
         }
+        addToCartButton.addEventListener('click', function () {
+            const quantity = parseInt(quantityInput.value);
+            window.location.href = `/api/v1/order/{{ obj.id }}/?count=${quantity}&lang={{ lang }}&chat_id={{ chat_id }}`
+        })
 
         // Handle minus button click
         minusButton.addEventListener('click', function () {

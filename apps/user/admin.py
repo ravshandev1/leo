@@ -1,11 +1,22 @@
 from django.contrib import admin
-from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, Bonus, InfoPhone, Info
+from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, Bonus, InfoPhone, Info, StorePhone, \
+    Store
 from .translations import CustomAdmin
+
+
+class StorePhoneInline(admin.StackedInline):
+    model = StorePhone
+    extra = 0
 
 
 class InfoPhoneInline(admin.StackedInline):
     model = InfoPhone
     extra = 0
+
+
+@admin.register(Store)
+class StoreAdmin(CustomAdmin):
+    inlines = [StorePhoneInline]
 
 
 @admin.register(Info)

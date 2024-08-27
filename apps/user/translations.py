@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, register
 from modeltranslation.admin import TranslationAdmin
-from .models import Region
+from .models import Region, Store
 
 
 class CustomAdmin(TranslationAdmin):
@@ -16,5 +16,10 @@ class CustomAdmin(TranslationAdmin):
 
 
 @register(Region)
-class CategoryTranslationOptions(TranslationOptions):
+class RegionTranslationOptions(TranslationOptions):
+    fields = ['name']
+
+
+@register(Store)
+class StoreTranslationOptions(TranslationOptions):
     fields = ['name']
