@@ -27,7 +27,7 @@ class CheckCodeView(generics.GenericAPIView):
         if not Bonus.objects.filter(code=kwargs['code']).first():
             return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!", "message_ru": "Такого кода не существует!"},
                                      status=404)
-        if UserPoint.objects.exists(bonus__code=kwargs['code']):
+        if UserPoint.objects.filter(bonus__code=kwargs['code']).first():
             return response.Response({"success": False, "message_uz": "Bu code avval foydalanilgan!", "message_ru": "Этот код использовался ранее!"},
                                      status=404)
         return response.Response({"success": True})
