@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, InfoPhone, Info
+from .models import Region, TelegramUser, UserPoint, VerifyPhone, InfoPhone, Info
 
 
 class InfoPhoneSerializer(serializers.ModelSerializer):
@@ -26,18 +26,13 @@ class PhoneSerializer(serializers.Serializer):
     phone = serializers.CharField()
 
 
-class UserPointImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserPointImage
-        fields = ['image']
-
-
 class UserPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPoint
-        fields = ['user', 'bonus', 'images']
+        fields = ['chat_id', 'code']
 
-    images = UserPointImageSerializer(many=True)
+    chat_id = serializers.IntegerField()
+    code = serializers.CharField()
 
 
 class RegionSerializer(serializers.ModelSerializer):

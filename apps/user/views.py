@@ -33,16 +33,14 @@ class CheckCodeView(generics.GenericAPIView):
         return response.Response({"success": True})
 
     def post(self, request, *args, **kwargs):
-        user = TelegramUser.objects.filter(chat_id=self.request.data['user']).first()
+        user = TelegramUser.objects.filter(chat_id=self.request.data['chat_id']).first()
         bonus = Bonus.objects.get(code=kwargs['code'])
-        self.request.data['user'] = user.id
-        self.request.data['bonus'] = bonus.id
-        serializer = UserPointSerializer(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return response.Response({"success": True,
+        if bonus:
+            UserPoint.objects.create(user_id=user.id, bonus_id=bonus.id)
+            return response.Response({"success": True,
                                   "message_uz": f"Hisobingizga {bonus.point} ball qo'shildi!\nBu ball 1 yil davomida amal qiladi\nAgar balldan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
-                                  "message_ru": ""})
+                                  "message_ru": f"{bonus.point} баллов добавлены к вашему счету!\n этот балл действителен в течение 1 года\nпесли вы не используете балл, он исчезнет через 1 год!"})
+        return response.Response({"success": False, "message_uz": "Bonus code mavjud emas", "message_ru": "Бонусный код недоступен"}, status=404)
 
 
 class SendCodeView(generics.GenericAPIView):

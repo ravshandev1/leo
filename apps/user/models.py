@@ -84,10 +84,3 @@ class UserPoint(models.Model):
     def __str__(self):
         return 'self.user'
 
-
-class UserPointImage(models.Model):
-    point = models.ForeignKey(UserPoint, models.CASCADE, 'images')
-    image = models.ImageField(upload_to='user_points')
-
-    def __str__(self):
-        return self.point

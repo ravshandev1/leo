@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, TelegramUser, UserPoint, UserPointImage, VerifyPhone, Bonus, InfoPhone, Info, StorePhone, \
+from .models import Region, TelegramUser, UserPoint, VerifyPhone, Bonus, InfoPhone, Info, StorePhone, \
     Store
 from .translations import CustomAdmin
 
@@ -45,12 +45,6 @@ class BonusAdmin(admin.ModelAdmin):
     list_display = ["code", "point", "created_at"]
 
 
-class UserPointImageInline(admin.StackedInline):
-    model = UserPointImage
-    extra = 0
-
-
 @admin.register(UserPoint)
 class UserPointAdmin(admin.ModelAdmin):
-    inlines = [UserPointImageInline]
     list_display = ["user", "bonus", "is_active", "created_at"]
