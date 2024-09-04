@@ -29,10 +29,9 @@ class PhoneSerializer(serializers.Serializer):
 class UserPointSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPoint
-        fields = ['chat_id', 'code']
+        fields = ['chat_id']
 
     chat_id = serializers.IntegerField()
-    code = serializers.CharField()
 
 
 class RegionSerializer(serializers.ModelSerializer):
