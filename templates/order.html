@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery Address</title>
+    <title>Order</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,22 +31,6 @@
             border-bottom: 1px solid #ddd;
         }
 
-        .back-button {
-            font-size: 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0 10px;
-        }
-
-        .search-bar {
-            flex-grow: 1;
-            padding: 10px;
-            margin-left: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
 
         .map-container {
             height: 300px;
@@ -67,11 +52,6 @@
             margin-bottom: 5px;
         }
 
-        .info-text {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 15px;
-        }
 
         .address-field {
             width: 100%;
@@ -82,13 +62,6 @@
             font-size: 16px;
         }
 
-        .delivery-cost {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 18px;
-            margin-top: 20px;
-        }
 
         .confirmation-container {
             padding: 20px;
@@ -97,6 +70,17 @@
         }
 
         .confirm-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #25c613;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
             width: 100%;
             padding: 15px;
             background-color: #ff4d4d;
@@ -116,64 +100,108 @@
 </head>
 <body>
 <div class="container">
-    <header>
-        <button onclick="back()" class="back-button">&#10094;</button>
-        <input type="text" class="search-bar" placeholder="Manzilni izlash">
-    </header>
-
-    <div class="map-container">
-        <!-- Placeholder for the map -->
-        <div id="googleMap" class="map-placeholder"></div>
-    </div>
 
     <div class="address-container">
-        <h2>Yetkazib berish manzilini ko‘rsating</h2>
-        <p class="info-text">Kiritilgan manzil avtomatik saqlanadi</p>
-
+        <h2>{{ region }} dan olib ketish manzilini ko‘rsating</h2>
         <form>
             <label for="district">Dukonni tanlang:</label>
             <select id="district" class="address-field">
                 {% for i in stores %}
-                    <option value="{{ i.id }}">{{ i.name }}</option>
+                    <option value="{{ i.id }},{{ i.latitude }},{{ i.longitude }}">{{ i.name }}</option>
                 {% endfor %}
             </select>
-
-            <label for="street">Ko‘cha:</label>
-            <input type="text" id="street" class="address-field" placeholder="Eski ko‘chasi, 12 A">
         </form>
-
-        <div class="delivery-cost">
-            <span>Yetkazib berish narxi:</span>
-            <strong>40 000</strong> so‘m
+        <div class="map-container">
+            <div id="googleMap"></div>
         </div>
     </div>
 
     <div class="confirmation-container">
-        <button class="confirm-button" disabled>Tasdiqlash</button>
-        <button class="confirm-button" disabled>Orqaga</button>
+        <button class="confirm-button" onclick="order_confirm()">{{ conf_btn }}</button>
+    </div>
+    <div class="confirmation-container">
+        <button class="back-btn" onclick="back()">{{ back_btn }}</button>
     </div>
 </div>
 </body>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <script>
-    function initMap() {
-        // Define the location (latitude and longitude)
-        const location = { lat: 40.7128, lng: -74.0060 }; // Example: New York City
+    //  function updateMap() {
+    //    const selectElement = document.getElementById("district");
+    //  selectElement.addEventListener('change', function () {
+    //    const [id, lat, lng] = selectElement.value.split(',').map(Number);
+    //  const map = L.map('googleMap').setView([lat, lng], 10);
+    //L.clearMarks()
+    //L.marker([lat, lng]).addTo(map)
+    //});
+    //}
 
-        // Create a map centered at the specified location
-        const map = new google.maps.Map(document.getElementById('googleMap'), {
-            zoom: 12, // Adjust the zoom level as needed
-            center: location
-        });
+    //function order_confirm() {
+    //   const selectElement = document.getElementById("district");
+    //  const [id] = selectElement.value.split(',').map(Number);
+    // window.location.href = `/api/v1/order-confirm/${id}/?lang={{ lang }}&total={{ total }}&chat_id={{ chat_id }}&count={{ count }}&p_id={{ pk }}`
+    //}
 
-        // Add a marker at the specified location
-        const marker = new google.maps.Marker({
-            position: location,
-            map: map
+    //function back() {
+    //  window.history.back();
+    //}
+
+    //window.onload = function () {
+    //  const selectElement = document.getElementById("district");
+    // const [id, lat, lng] = selectElement.value.split(',').map(Number);
+    //const map = L.map('googleMap').setView([lat, lng], 10);
+    //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //   maxZoom: 19,
+    //}).addTo(map);
+    //L.marker([lat, lng]).addTo(map)
+    //updateMap();
+    //};
+</script>
+<script>
+    let map;
+    let marker;
+
+    function initMap(lat, lng) {
+        map = L.map('googleMap').setView([lat, lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        marker = L.marker([lat, lng]).addTo(map);
+    }
+
+    function order_confirm() {
+        const selectElement = document.getElementById("district");
+        const [id] = selectElement.value.split(',').map(Number);
+        window.location.href = `/api/v1/order-confirm/${id}/?lang={{ lang }}&total={{ total }}&chat_id={{ chat_id }}&count={{ count }}&p_id={{ pk }}`
+    }
+
+    function updateMap() {
+        const selectElement = document.getElementById("district");
+        selectElement.addEventListener('change', function () {
+            const [id, lat, lng] = selectElement.value.split(',').map(Number);
+
+            if (marker) {
+                map.removeLayer(marker);  // Remove the old marker
+            }
+
+            map.setView([lat, lng], 13);  // Move the map view to the new coordinates
+            marker = L.marker([lat, lng]).addTo(map);  // Add the new marker
         });
     }
+
     function back() {
         window.history.back();
     }
+
+    // Initialize map with the first store's coordinates on page load
+    window.onload = function () {
+        const selectElement = document.getElementById("district");
+        const [id, lat, lng] = selectElement.value.split(',').map(Number);
+        initMap(lat, lng);
+        updateMap();
+    };
+
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLhyBtXSTOZE6C7lCy0gxvzOAZO22ghIk&callback=initMap" async defer></script>
 </html>

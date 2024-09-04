@@ -26,10 +26,8 @@ class InfoPhone(models.Model):
 class Store(models.Model):
     name = models.CharField(max_length=100)
     region = models.ForeignKey(Region, models.CASCADE, 'stores')
-    image = models.ImageField(upload_to='stores/')
     longitude = models.CharField(max_length=100)
     latitude = models.CharField(max_length=100)
-    link = models.URLField(max_length=200)
 
     def __str__(self):
         return self.name

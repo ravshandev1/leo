@@ -17,6 +17,7 @@ class InfoPhoneInline(admin.StackedInline):
 @admin.register(Store)
 class StoreAdmin(CustomAdmin):
     inlines = [StorePhoneInline]
+    list_display = ['id', 'name']
 
 
 @admin.register(Info)

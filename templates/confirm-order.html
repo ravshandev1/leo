@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Order</title>
+    <style>
+        .confirm-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #25c613;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: not-allowed;
+        }
+
+        .confirmation-container {
+            padding: 20px;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body>
+<h2>{{ store.region }}</h2>
+<h3>{{ store.name }}</h3>
+<p>{{ warning_text }}</p>
+<h4>{{ product.name }}</h4>
+<p>{{ product.count }}</p>
+<p>{{ product.price }}</p>
+<p>{{ product.total }}</p>
+<div class="confirmation-container">
+    <button class="confirm-button">Tasdiqlash</button>
+</div>
+<div class="confirmation-container">
+    <button class="back-btn" onclick="back()">Orqaga</button>
+</div>
+</body>
+<script>
+    function back() {
+        window.history.back();
+    }
+</script>
+</html>

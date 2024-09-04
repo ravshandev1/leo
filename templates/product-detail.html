@@ -122,7 +122,6 @@
             padding: 15px 30px;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
             font-size: 18px;
             cursor: not-allowed;
         }
@@ -211,7 +210,8 @@
         }
         addToCartButton.addEventListener('click', function () {
             const quantity = parseInt(quantityInput.value);
-            window.location.href = `/api/v1/order/{{ obj.id }}/?count=${quantity}&lang={{ lang }}&chat_id={{ chat_id }}`
+            const total = parseInt(totalPriceElement.textContent)
+            window.location.href = `/api/v1/order/{{ obj.id }}/?count=${quantity}&total=${total}&lang={{ lang }}&chat_id={{ chat_id }}`
         })
 
         // Handle minus button click
