@@ -36,6 +36,8 @@ class CheckCodeView(generics.GenericAPIView):
         user = TelegramUser.objects.filter(chat_id=self.request.data['chat_id']).first()
         bonus = Bonus.objects.get(code=kwargs['code'])
         if bonus:
+            user.point += bonus.point
+            user.save()
             UserPoint.objects.create(user_id=user.id, bonus_id=bonus.id)
             return response.Response({"success": True,
                                   "message_uz": f"Hisobingizga {bonus.point} ball qo'shildi!\nBu ball 1 yil davomida amal qiladi\nAgar balldan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
