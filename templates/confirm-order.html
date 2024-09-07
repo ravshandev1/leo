@@ -43,7 +43,7 @@
 <p>{{ product.price }}</p>
 <p>{{ product.total }}</p>
 <div class="confirmation-container">
-    <button class="confirm-button">Tasdiqlash</button>
+    <button class="confirm-button" onclick="order()">Tasdiqlash</button>
 </div>
 <div class="confirmation-container">
     <button class="back-btn" onclick="back()">Orqaga</button>
@@ -52,6 +52,31 @@
 <script>
     function back() {
         window.history.back();
+    }
+
+    async function order() {
+        res = await fetch("/api/v1/confirm/",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    "chat_id": {{ chat_id }},
+                    "store_id": {{ store.id }},
+                    "lang": "{{ lang }}",
+                    "count": {{ count }},
+                    "total": {{ total }},
+                    "p_id": {{ p_id }}
+                })
+            }
+        );
+        console.log(res.statusText)
+        if (res.status === 200) {
+            alert("Success")
+            window.location.href = "/api/v1/?chat_id={{ chat_id }}&lang={{ lang }}"
+        }
+        else {
+            alert("Error")
+        }
+
     }
 </script>
 </html>

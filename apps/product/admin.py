@@ -1,8 +1,11 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Order
 from .translations import CustomAdmin
 
 
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['user', 'product', 'count', 'store', 'created_at']
 
 
 @admin.register(Category)

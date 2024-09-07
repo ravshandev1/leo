@@ -1,4 +1,5 @@
 from django.db import models
+from user.models import Bonus, TelegramUser, Store
 
 
 class Category(models.Model):
@@ -13,7 +14,7 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, models.CASCADE, 'products')
     name = models.CharField(max_length=250, unique=True)
-    bonus = models.PositiveIntegerField(default=1)
+    bonus = models.ForeignKey(Bonus, models.CASCADE, 'products')
     price = models.IntegerField()
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -32,3 +33,15 @@ class ProductImage(models.Model):
     @property
     def image_path(self):
         return self.image.path
+
+
+class Order(models.Model):
+    user = models.ForeignKey(TelegramUser, models.CASCADE, 'orders')
+    product = models.ForeignKey(Product, models.CASCADE, 'orders')
+    count = models.IntegerField(default=1)
+    total = models.IntegerField(default=1)
+    store = models.ForeignKey(Store, models.CASCADE, 'orders')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user

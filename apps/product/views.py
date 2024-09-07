@@ -1,8 +1,11 @@
-from itertools import product
-
+from pytz import timezone
 from django.shortcuts import render
-from .models import Category, Product
-from user.models import TelegramUser, Store, StorePhone
+from django.http import JsonResponse
+from .models import Category, Product, Order
+from user.models import TelegramUser, Store
+from requests import post
+from django.conf import settings
+import json
 
 
 def categories_view(req):
@@ -108,7 +111,6 @@ def order_confirm_view(req, pk):
     lang = req.GET.get('lang')
     p_id = req.GET.get('p_id')
     total = req.GET.get('total')
-    user = TelegramUser.objects.filter(chat_id=chat_id).first()
     store = Store.objects.filter(id=pk).first()
     product = Product.objects.filter(id=p_id).first()
     store_dict = dict()
@@ -131,5 +133,63 @@ def order_confirm_view(req, pk):
         product_dict['price'] = f"Стоимость: {product.price}"
         product_dict['total'] = f"Итого: {total}"
     store_dict['phones'] = store.phones.all()
+    store_dict['id'] = store.id
+    product_dict['id'] = product.id
     return render(req, 'confirm-order.html',
-                  {'warning_text': warning_text, 'store': store_dict, 'product': product_dict, 'chat_id': chat_id})
+                  {'warning_text': warning_text, 'store': store_dict, 'product': product_dict, 'chat_id': chat_id, 'lang': lang, 'count': count, 'total': total, 'p_id': p_id})
+
+
+def confirm_view(req):
+    try:
+        data = json.loads(req.body)  # JSON ma'lumotlarini o'qish
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+    user = TelegramUser.objects.filter(chat_id=data.get('chat_id')).first()
+    store = Store.objects.filter(id=data.get('store_id')).first()
+    product = Product.objects.filter(id=data.get('p_id')).first()
+    total = data.get('total')
+    count = data.get('count')
+    lang = data.get('lang')
+    if not (user and store and product):
+        return JsonResponse({'success': False}, status=400)
+    user.point -= total
+    user.save()
+    order = Order.objects.create(user=user, product=product, store=store, count=count, total=total)
+    txt = ""
+    if lang == "uz":
+        txt += f"Mahsulot: {product.name_uz}\n"
+        txt += f"Dukon nomi: {store.name_uz}\n"
+        txt += f"Viloyat: {store.region.name_uz}\n"
+        txt += f"Soni: {count}\n"
+        txt += f"Narxi: {product.price}\n"
+        txt += "5 kundan so'ng olishingiz mumkin\n"
+        txt += f"Jami: {total}\n"
+        txt += f"Telefonlar: {[i.phone for i in store.phones.all()]}\n"
+    elif lang == "ru":
+        txt += f"Продукт: {product.name_ru}\n"
+        txt += f"Название магазина: {store.name_ru}"
+        txt += f"Региональный: {store.region.name_ru}"
+        txt += f"Количество: {count}\n"
+        txt += f"Стоимость: {product.price}\n"
+        txt += "Вы можете получить его через 5 дней\n"
+        txt += f"Итого: {total}"
+        txt += f"Телефоны: {[i.phone for i in store.phones.all()]}\n"
+    payload = {
+        "chat_id": user.chat_id,
+        "text": txt,
+        "parse_mode": "HTML"
+    }
+    post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+    txt = f"Foydalanuvchi: {user.phone}\n"
+    txt += f"Mahsulot: {product.name_uz}\n"
+    txt += f"Viloyat: {store.region.name_uz}\n"
+    txt += f"Dukon: {store.name_uz}\n"
+    txt += f"Soni: {count}\n"
+    txt += f"Buyurtma vaqti: {order.created_at.astimezone(tz=timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')}"
+    payload = {
+        "chat_id": settings.GROUP_ID,
+        "text": txt,
+        "parse_mode": "HTML"
+    }
+    post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+    return JsonResponse({'success': True})

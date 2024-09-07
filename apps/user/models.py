@@ -47,14 +47,11 @@ class TelegramUser(models.Model):
     phone = models.CharField(max_length=100)
     region = models.ForeignKey(Region, models.SET_NULL, null=True, blank=True)
     lang = models.CharField(max_length=2)
+    point = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
-
-    @property
-    def point(self):
-        return sum([i.bonus.point for i in self.points.filter(is_active=True)])
 
 
 class VerifyPhone(models.Model):
@@ -78,9 +75,7 @@ class Bonus(models.Model):
 class UserPoint(models.Model):
     user = models.ForeignKey(TelegramUser, models.CASCADE, 'points')
     bonus = models.ForeignKey(Bonus, models.CASCADE)
-    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return 'self.user'
-
+        return self.user.name

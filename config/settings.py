@@ -20,6 +20,8 @@ DEBUG = ENV.get('DEBUG') == "1"
 ALLOWED_HOSTS = ['*']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
+BOT_TOKEN = ENV.get('BOT_TOKEN')
+GROUP_ID = ENV.get('GROUP_ID')
 # Application definition
 CSRF_TRUSTED_ORIGINS = ['https://leo.ravshandev.uz']
 CORS_ALLOW_ALL_ORIGINS = True
@@ -48,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

@@ -47,4 +47,4 @@ class BonusAdmin(admin.ModelAdmin):
 
 @admin.register(UserPoint)
 class UserPointAdmin(admin.ModelAdmin):
-    list_display = ["user", "bonus", "is_active", "created_at"]
+    list_display = ["user", "bonus", "created_at"]
