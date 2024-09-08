@@ -17,12 +17,14 @@ class InfoPhoneInline(admin.StackedInline):
 @admin.register(Store)
 class StoreAdmin(CustomAdmin):
     inlines = [StorePhoneInline]
-    list_display = ['id', 'name']
+    list_display = ['id', 'name', 'region']
+    list_filter = ['region']
 
 
 @admin.register(Info)
 class InfoAdmin(admin.ModelAdmin):
     inlines = [InfoPhoneInline]
+    list_display = ['id', 'link']
 
 
 @admin.register(Region)

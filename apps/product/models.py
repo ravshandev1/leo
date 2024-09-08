@@ -14,7 +14,7 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, models.CASCADE, 'products')
     name = models.CharField(max_length=250, unique=True)
-    bonus = models.ForeignKey(Bonus, models.CASCADE, 'products')
+    bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products')
     price = models.IntegerField()
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
