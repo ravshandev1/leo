@@ -45,6 +45,7 @@ class VerifyPhoneAdmin(admin.ModelAdmin):
 @admin.register(Bonus)
 class BonusAdmin(admin.ModelAdmin):
     list_display = ["code", "point", "created_at"]
+    exclude = ['has_product']
 
 
 @admin.register(UserPoint)
