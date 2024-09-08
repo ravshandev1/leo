@@ -93,7 +93,7 @@
 
 <section class="product-list">
     {% for i in qs %}
-        <div class="product-item" onclick="get_product({{ i.id }}, {{ i.name|safe }})">
+        <div class="product-item" onclick="get_product({{ i.id }}, '{{ i.name }}')">
             <img src="{{ i.image.image.url }}" alt="img">
             <div class="product-details">
                 <span class="product-name">{{ i.name }}</span>
