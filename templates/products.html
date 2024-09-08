@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products</title>
     <style>
+        @media (max-width: 576px) {
+
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -45,6 +49,7 @@
 
         .product-item {
             display: flex;
+            gap: 12px;
             align-items: center;
             background-color: #fff;
             margin-bottom: 10px;
@@ -53,30 +58,38 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .product-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
+        .pr_img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 12px;
             margin-right: 10px;
         }
 
         .product-details {
             flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+        .pr_text {
+            display: flex;
+            flex-direction: column;
         }
 
         .product-name {
-            font-size: 16px;
+            font-size: 18px;
+            margin-bottom: 2px;
             font-weight: bold;
             color: #333;
         }
 
         .product-bonus {
-            font-size: 12px;
+            font-size: 14px;
             color: green;
         }
 
         .product-price {
-            font-size: 14px;
+            font-size: 16px;
             color: #555;
         }
 
@@ -94,12 +107,14 @@
 <section class="product-list">
     {% for i in qs %}
         <div class="product-item" onclick="get_product({{ i.id }}, '{{ i.name }}')">
-            <img src="{{ i.image.image.url }}" alt="img">
             <div class="product-details">
-                <span class="product-name">{{ i.name }}</span>
-                <span class="product-bonus">Bonus <strong>{{ i.bonus }}</strong> ball</span>
-                <span class="product-price">Narxi <strong>{{ i.price }}</strong> ball</span>
+                <img class="pr_img" src="{{ i.image.image.url }}" alt="img">
+                <div class="pr_text">
+                    <span class="product-name">{{ i.name }}</span>
+                    <span class="product-bonus">Bonus <strong>{{ i.bonus.point }}</strong> ball</span>
+                </div>
             </div>
+            <span class="product-price">Narxi <strong>{{ i.price }}</strong> ball</span>
         </div>
     {% endfor %}
 </section>
