@@ -66,6 +66,7 @@ class VerifyPhone(models.Model):
 class Bonus(models.Model):
     code = models.CharField(max_length=100, unique=True)
     point = models.IntegerField(default=1)
+    has_product = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
