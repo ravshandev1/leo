@@ -14,7 +14,7 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, models.CASCADE, 'products')
     name = models.CharField(max_length=250, unique=True)
-    bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products', limit_choices_to={'has_product': False})
+    bonus = models.ForeignKey(Bonus, models.CASCADE, related_name='products', limit_choices_to={'has_product': False})
     price = models.IntegerField()
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,9 +24,9 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        bonus = self.bonus
-        bonus.has_product = True
-        bonus.save()
+        if self.bonus.has_product is False:
+            self.bonus.has_product = True
+            self.bonus.save()
 
 
 
