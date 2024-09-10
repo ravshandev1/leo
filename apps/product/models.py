@@ -23,10 +23,11 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         bonus = self.bonus
         bonus.has_product = True
         bonus.save()
-        super().save(*args, **kwargs)
+
 
 
 class ProductImage(models.Model):

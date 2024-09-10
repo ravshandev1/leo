@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/leo</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="usta@leo.ravshandev.uz" uuid="e948b544-e23b-415a-b8a0-9d88ddd28a27">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://leo.ravshandev.uz:5432/usta</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
