@@ -4,34 +4,110 @@
     <meta charset="UTF-8">
     <title>Confirm Order</title>
     <style>
-        .confirm-button {
-            width: 100%;
-            padding: 15px;
-            background-color: #25c613;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: not-allowed;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h2, h3, p, h4 {
+            margin: 10px;
+        }
+
+        h2 {
+            font-size: 24px;
+            text-align: center;
+            color: #25c613;
+        }
+
+        h3 {
+            font-size: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            text-align: center;
+            color: #666;
         }
 
         .confirmation-container {
             padding: 20px;
+            margin: 10px;
             background-color: #ffffff;
-            border-top: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .back-btn {
+        .confirm-button, .back-btn {
             width: 100%;
             padding: 15px;
-            background-color: #ff4d4d;
-            color: white;
             border: none;
             border-radius: 5px;
             font-size: 18px;
-            cursor: not-allowed;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
+        .confirm-button {
+            background-color: #25c613;
+            color: white;
+        }
+
+        .back-btn {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 22px;
+            }
+
+            h3 {
+                font-size: 18px;
+            }
+
+            h4, p {
+                font-size: 14px;
+            }
+
+            .confirm-button, .back-btn {
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .confirmation-container {
+                margin: 5px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+
+            h4, p {
+                font-size: 12px;
+            }
+
+            .confirm-button, .back-btn {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .confirmation-container {
+                margin: 3px;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -48,35 +124,35 @@
 <div class="confirmation-container">
     <button class="back-btn" onclick="back()">Orqaga</button>
 </div>
-</body>
+
 <script>
     function back() {
         window.history.back();
     }
 
     async function order() {
-        res = await fetch("/api/v1/confirm/",
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    "chat_id": {{ chat_id }},
-                    "store_id": {{ store.id }},
-                    "lang": "{{ lang }}",
-                    "count": {{ count }},
-                    "total": {{ total }},
-                    "p_id": {{ p_id }}
-                })
-            }
-        );
-        console.log(res.statusText)
+        const res = await fetch("/api/v1/confirm/", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "chat_id": {{ chat_id }},
+                "store_id": {{ store.id }},
+                "lang": "{{ lang }}",
+                "count": {{ count }},
+                "total": {{ total }},
+                "p_id": {{ p_id }}
+            })
+        });
+        console.log(res.statusText);
         if (res.status === 200) {
-            alert("Success")
-            window.location.href = "/api/v1/?chat_id={{ chat_id }}&lang={{ lang }}"
+            alert("Success");
+            window.location.href = "/api/v1/?chat_id={{ chat_id }}&lang={{ lang }}";
+        } else {
+            alert("Error");
         }
-        else {
-            alert("Error")
-        }
-
     }
 </script>
+</body>
 </html>
