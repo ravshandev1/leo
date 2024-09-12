@@ -17,13 +17,13 @@ SECRET_KEY = ENV.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DEBUG') == "1"
 
-ALLOWED_HOSTS = ['leo.ravshandev.uz', 'localhost']
+ALLOWED_HOSTS = ['leobonus.uz', 'localhost']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
 BOT_TOKEN = ENV.get('BOT_TOKEN')
 GROUP_ID = ENV.get('GROUP_ID')
 # Application definition
-CSRF_TRUSTED_ORIGINS = ['https://leo.ravshandev.uz']
+CSRF_TRUSTED_ORIGINS = ['https://leobonus.uz']
 CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'modeltranslation',
