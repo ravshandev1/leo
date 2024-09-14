@@ -9,14 +9,14 @@ from django.conf.urls.i18n import i18n_patterns
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Leo API",
+        title="Leo Usta Bot API",
         default_version='v1',
         description="Test description",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="ravshangiyosov2002@gmail.com"),
         license=openapi.License(name="BSD License"),
     ),
-    # url='https://leobonus.uz',
+    url=settings.BASE_URL,
     public=True,
     permission_classes=[permissions.AllowAny]
 )

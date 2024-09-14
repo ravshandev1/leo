@@ -12,13 +12,11 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Build Docker image and Push the image to DockerHUB
-      run: | 
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/leo-back .
-        docker push ${{ secrets.DOCKER_USERNAME }}/leo-back
+      run: docker build -t leo-back .
 
     - name: Deploy Docker container
       run: |
         docker stop leo-back || true
         docker rm leo-back || true
-        docker run --restart unless-stopped --name leo-back -dp 8001:8000 -v /home/ubuntu/leo/back/media:/app/media ${{ secrets.DOCKER_USERNAME }}/leo-back
+        docker run --restart unless-stopped --name leo-back -dp 8001:8000 -v /home/ubuntu/leo/back/media:/app/media leo-back
 
