@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,11 +52,18 @@
             <img src="{{ i.icon.url }}" alt="{{ i.name }} icon" class="item-icon">
         </div>
     {% endfor %}
+    <div class="catalog-item" onclick="get_cart()">
+        <span class="item-text">{{ cart }}</span>
+        <img src="{% static 'cart.png' %}" alt="{{ cart }} icon" class="item-icon">
+    </div>
 </section>
 </body>
 <script>
     function get_subcategories(pk, name) {
         window.location.href = `/api/v1/products/${pk}/?name=${name}&lang={{ lang }}&chat_id={{ chat_id }}`
+    }
+    function get_cart(){
+        window.location.href = "/api/v1/cart/{{ chat_id }}/"
     }
 </script>
 </html>

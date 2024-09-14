@@ -1,9 +1,17 @@
 from rest_framework import generics, response
 from .serializers import RegionSerializer, TelegramUserSerializer, UserSerializer, UserPointSerializer, PhoneSerializer, \
-    VerifyPhoneSerializer, InfoSerializer
-from .models import TelegramUser, Region, Bonus, UserPoint, VerifyPhone, Info
+    VerifyPhoneSerializer, InfoSerializer, StoreSerializer
+from .models import TelegramUser, Region, Bonus, UserPoint, VerifyPhone, Info, Store
 from .utils import send_verification_code
 from random import randint
+
+
+class StoreListView(generics.ListAPIView):
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
+        return Store.objects.filter(region_id=user.region_id)
 
 
 class RegionListView(generics.ListAPIView):
@@ -25,10 +33,12 @@ class CheckCodeView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         if not Bonus.objects.filter(code=kwargs['code']).first():
-            return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!", "message_ru": "Такого кода не существует!"},
+            return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!",
+                                      "message_ru": "Такого кода не существует!"},
                                      status=404)
         if UserPoint.objects.filter(bonus__code=kwargs['code']).first():
-            return response.Response({"success": False, "message_uz": "Bu code avval foydalanilgan!", "message_ru": "Этот код использовался ранее!"},
+            return response.Response({"success": False, "message_uz": "Bu code avval foydalanilgan!",
+                                      "message_ru": "Этот код использовался ранее!"},
                                      status=404)
         return response.Response({"success": True})
 
@@ -40,9 +50,11 @@ class CheckCodeView(generics.GenericAPIView):
             user.save()
             UserPoint.objects.create(user_id=user.id, bonus_id=bonus.id)
             return response.Response({"success": True,
-                                  "message_uz": f"Hisobingizga {bonus.point} ball qo'shildi!\nBu ball 1 yil davomida amal qiladi\nAgar balldan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
-                                  "message_ru": f"{bonus.point} баллов добавлены к вашему счету!\n этот балл действителен в течение 1 года\nпесли вы не используете балл, он исчезнет через 1 год!"})
-        return response.Response({"success": False, "message_uz": "Bonus code mavjud emas", "message_ru": "Бонусный код недоступен"}, status=404)
+                                      "message_uz": f"Hisobingizga {bonus.point} ball qo'shildi!\nBu ball 1 yil davomida amal qiladi\nAgar balldan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
+                                      "message_ru": f"{bonus.point} баллов добавлены к вашему счету!\n этот балл действителен в течение 1 года\nпесли вы не используете балл, он исчезнет через 1 год!"})
+        return response.Response(
+            {"success": False, "message_uz": "Bonus code mavjud emas", "message_ru": "Бонусный код недоступен"},
+            status=404)
 
 
 class SendCodeView(generics.GenericAPIView):

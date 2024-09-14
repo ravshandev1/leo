@@ -1,11 +1,89 @@
 from pytz import timezone
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Category, Product, Order
+from .models import Category, Product, Order, Cart
 from user.models import TelegramUser, Store
 from requests import post
 from django.conf import settings
 import json
+from rest_framework import generics, response
+from .serializers import ProductSerializer, CategorySerializer, CartSerializer, OrderSerializer
+
+
+class OrderView(generics.GenericAPIView):
+    serializer_class = OrderSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
+        data = self.request.data
+        data['user'] = user
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        user.point -= order.total
+        user.save()
+        txt = f"Foydalanuvchi: {user.phone}\n"
+        txt += f"Mahsulot: {order.product.name_uz}\n"
+        txt += f"Viloyat: {order.store.region.name_uz}\n"
+        txt += f"Dukon: {order.store.name_uz}\n"
+        txt += f"Soni: {order.count}\n"
+        txt += f"Buyurtma vaqti: {order.created_at.astimezone(tz=timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')}"
+        payload = {
+            "chat_id": settings.GROUP_ID,
+            "text": txt,
+            "parse_mode": "HTML"
+        }
+        post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+        txt = ""
+        if user.lang == "uz":
+            txt += f"Mahsulot: {order.product.name_uz}\n"
+            txt += f"Dukon nomi: {order.store.name_uz}\n"
+            txt += f"Viloyat: {order.store.region.name_uz}\n"
+            txt += f"Soni: {order.count}\n"
+            txt += f"Narxi: {order.product.price}\n"
+            txt += "5 kundan so'ng olishingiz mumkin\n"
+            txt += f"Jami: {order.total}\n"
+            txt += f"Telefonlar: {[i.phone for i in order.store.phones.all()]}\n"
+        elif user.lang == "ru":
+            txt += f"Продукт: {order.product.name_ru}\n"
+            txt += f"Название магазина: {order.store.name_ru}"
+            txt += f"Региональный: {order.store.region.name_ru}"
+            txt += f"Количество: {order.count}\n"
+            txt += f"Стоимость: {order.product.price}\n"
+            txt += "Вы можете получить его через 5 дней\n"
+            txt += f"Итого: {order.total}"
+            txt += f"Телефоны: {[i.phone for i in order.store.phones.all()]}\n"
+        payload = {
+            "chat_id": user.chat_id,
+            "text": txt,
+            "parse_mode": "HTML"
+        }
+        post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+        return response.Response({'success': True})
+
+
+class CategoryListView(generics.ListAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
+
+
+class ProductListView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+
+    def get_queryset(self):
+        return Product.objects.filter(category_id=self.kwargs['subcategory_id'])
+
+
+class ProductDetailView(generics.RetrieveAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+
+
+class CartListView(generics.ListAPIView):
+    serializer_class = CartSerializer
+
+    def get_queryset(self):
+        return Cart.objects.filter(user__chat_id=self.kwargs['chat_id'])
 
 
 def categories_view(req):
@@ -14,15 +92,33 @@ def categories_view(req):
     chat_id = req.GET.get('chat_id')
     ls = list()
     title = None
+    cart = None
     if lang == "uz":
         title = "Katolog"
+        cart = "Savatcham"
         for i in qs:
-            ls.append({'id': i.id, 'name': i.name_uz, 'icon': i.icon})
+            subs = list()
+            for j in i.sub_categories.all:
+                subs.append({'id': j.id, 'name': j.name_uz})
+            ls.append({'name': i.name_uz, 'icon': i.icon, 'subs': subs})
     elif lang == "ru":
         title = "Каталог"
+        cart = "Корзина"
         for i in qs:
-            ls.append({'id': i.id, 'name': i.name_ru, 'icon': i.icon})
-    return render(req, 'categories.html', {'qs': ls, 'title': title, 'lang': lang, 'chat_id': chat_id})
+            subs = list()
+            for j in i.sub_categories.all:
+                subs.append({'id': j.id, 'name': j.name_ru})
+            ls.append({'name': i.name_ru, 'icon': i.icon, 'subs': subs})
+    return render(req, 'categories.html', {'qs': ls, 'title': title, 'lang': lang, 'chat_id': chat_id, 'cart': cart})
+
+
+def get_cart(req, pk):
+    lang = req.GET.get('lang')
+    qs = Cart.objects.filter(user__chat_id=pk)
+    ls = list()
+    if lang == "uz":
+        for i in qs:
+            ls.append({'id': i.id, 'name': i.name_uz, 'image': i.images.first(), 'bonus': i.bonus, 'price': i.price})
 
 
 def products_view(req, cat_id):
@@ -136,7 +232,8 @@ def order_confirm_view(req, pk):
     store_dict['id'] = store.id
     product_dict['id'] = product.id
     return render(req, 'confirm-order.html',
-                  {'warning_text': warning_text, 'store': store_dict, 'product': product_dict, 'chat_id': chat_id, 'lang': lang, 'count': count, 'total': total, 'p_id': p_id})
+                  {'warning_text': warning_text, 'store': store_dict, 'product': product_dict, 'chat_id': chat_id,
+                   'lang': lang, 'count': count, 'total': total, 'p_id': p_id})
 
 
 def confirm_view(req):

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import RegionListView, UserListView, TelegramUserView, CheckCodeView, SendCodeView, VerifyCodeView, \
-    UserCheckView, InfoView
+    UserCheckView, InfoView, StoreListView
 
 urlpatterns = [
     path('<int:chat_id>/', TelegramUserView.as_view(), name='telegram_user'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('send-sms/', SendCodeView.as_view(), name='send-sms'),
     path('verify/', VerifyCodeView.as_view(), name='verify'),
     path('info/', InfoView.as_view(), name='info'),
+    path('stores/<int:chat_id>/', StoreListView.as_view(), name='stores'),
 ]

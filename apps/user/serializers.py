@@ -1,5 +1,23 @@
 from rest_framework import serializers
-from .models import Region, TelegramUser, UserPoint, VerifyPhone, InfoPhone, Info
+from .models import Region, TelegramUser, UserPoint, VerifyPhone, InfoPhone, Info, Bonus, Store, StorePhone
+
+
+class StorePhoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StorePhone
+        fields = ['id', 'phone']
+
+
+class StoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        fields = ['id', 'name', 'longitude', 'latitude']
+
+
+class BonusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bonus
+        fields = ['id', 'code', 'point']
 
 
 class InfoPhoneSerializer(serializers.ModelSerializer):

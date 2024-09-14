@@ -7,7 +7,8 @@ def send_verification_code(phone: str, code: str):
     token = request("post", 'https://notify.eskiz.uz/api/auth/login',
                     data={'email': settings.SMS_EMAIL, 'password': settings.SMS_PASSWORD})
     headers = {
-        "Authorization": f"Bearer {token.json()['data']['token']}"
+        "Authorization": f"Bearer {token.json()['data']['token']}",
+        "Content-Type": "application/json"
     }
     data = {
         'mobile_phone': phone,

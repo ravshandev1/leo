@@ -16,14 +16,14 @@ SECRET_KEY = ENV.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DEBUG') == "1"
-
-ALLOWED_HOSTS = ['leobonus.uz', 'localhost']
+BASE_URL = ENV.get('BASE_URL')
+ALLOWED_HOSTS = ['leobonus.uz', '0.0.0.0']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
 BOT_TOKEN = ENV.get('BOT_TOKEN')
 GROUP_ID = ENV.get('GROUP_ID')
 # Application definition
-CSRF_TRUSTED_ORIGINS = ['https://leobonus.uz']
+CSRF_TRUSTED_ORIGINS = [BASE_URL]
 CORS_ALLOW_ALL_ORIGINS = True
 INSTALLED_APPS = [
     'modeltranslation',
@@ -111,8 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 LANGUAGES = (
-    ('ru', 'Russian'),
     ('uz', 'Uzbek'),
+    ('ru', 'Russian'),
 )
 
 MODELTRANSLATION_LANGUAGES = ('uz', 'ru')
@@ -131,6 +131,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
