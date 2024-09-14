@@ -17,7 +17,7 @@ SECRET_KEY = ENV.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DEBUG') == "1"
 BASE_URL = ENV.get('BASE_URL')
-ALLOWED_HOSTS = ['leobonus.uz', '0.0.0.0']
+ALLOWED_HOSTS = ['leobonus.uz', 'localhost']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
 BOT_TOKEN = ENV.get('BOT_TOKEN')
