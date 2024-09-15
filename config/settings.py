@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -110,9 +111,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
+from django.utils.translation import gettext_lazy as _
+
 LANGUAGES = (
-    ('uz', 'Uzbek'),
-    ('ru', 'Russian'),
+    ('uz', _('Uzbek')),
+    ('ru', _('Russian')),
 )
 
 MODELTRANSLATION_LANGUAGES = ('uz', 'ru')
@@ -121,7 +124,7 @@ LANGUAGE_CODE = 'ru'
 TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
