@@ -111,14 +111,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-from django.utils.translation import gettext_lazy as _
 
 LANGUAGES = (
-    ('uz', _('Uzbek')),
-    ('ru', _('Russian')),
+    ('ru', 'Russian'),
+    ('uz', 'Uzbek'),
 )
 
-MODELTRANSLATION_LANGUAGES = ('uz', 'ru')
+MODELTRANSLATION_LANGUAGES = ('ru', 'uz')
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Asia/Tashkent'

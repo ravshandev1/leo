@@ -17,8 +17,8 @@ class Info(models.Model):
     def __str__(self):
         return self.link
     class Meta:
-        verbose_name = "Поддержка"
-        verbose_name_plural = "Поддержка"
+        verbose_name = "Связаться с нами"
+        verbose_name_plural = "Связаться с нами"
 
 
 class InfoPhone(models.Model):
