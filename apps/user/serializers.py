@@ -17,7 +17,7 @@ class StoreSerializer(serializers.ModelSerializer):
 class BonusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bonus
-        fields = ['id', 'code', 'point']
+        fields = ['id', 'code', 'summa']
 
 
 class InfoPhoneSerializer(serializers.ModelSerializer):
@@ -61,9 +61,9 @@ class RegionSerializer(serializers.ModelSerializer):
 class TelegramUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = TelegramUser
-        fields = ['name', 'chat_id', 'phone', 'region', 'lang', 'point']
+        fields = ['name', 'chat_id', 'phone', 'region', 'lang', 'summa']
 
-    point = serializers.IntegerField(read_only=True)
+    summa = serializers.IntegerField(read_only=True)
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -13,6 +13,8 @@ class Info(models.Model):
 
     def __str__(self):
         return self.link
+    class Meta:
+        verbose_name = ""
 
 
 class InfoPhone(models.Model):
