@@ -68,7 +68,7 @@ class ProductImage(models.Model):
         return self.product.name
 
     @property
-    def image_path(self):
+    def image_url(self):
         return f"{settings.BASE_URL}{self.image.url}"
 
 
