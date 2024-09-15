@@ -34,9 +34,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'bonus', 'price', 'description']
+        fields = ['id', 'name', 'bonus', 'price', 'description', 'images']
 
     bonus = serializers.CharField(source='bonus.summa')
+    images = ProductImageSerializer(many=True, read_only=True)
 
 
 class CartSerializer(serializers.ModelSerializer):
