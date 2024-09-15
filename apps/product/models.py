@@ -24,7 +24,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(Category, models.CASCADE, 'sub_categories')
 
     def __str__(self):
-        return self.name
+        return self.name_ru
 
 
 class Product(models.Model):

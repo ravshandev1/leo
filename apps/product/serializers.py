@@ -36,7 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'bonus', 'price', 'description']
 
-    bonus = serializers.CharField(source='bonus.point')
+    bonus = serializers.CharField(source='bonus.summa')
 
 
 class CartSerializer(serializers.ModelSerializer):
