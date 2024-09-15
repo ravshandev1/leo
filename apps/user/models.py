@@ -6,6 +6,9 @@ class Region(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name = "Регион"
+        verbose_name_plural = 'Регионы'
 
 
 class Info(models.Model):
@@ -14,7 +17,8 @@ class Info(models.Model):
     def __str__(self):
         return self.link
     class Meta:
-        verbose_name = ""
+        verbose_name = "Поддержка"
+        verbose_name_plural = "Поддержка"
 
 
 class InfoPhone(models.Model):
