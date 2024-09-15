@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, TelegramUser, UserPoint, VerifyPhone, InfoPhone, Info, Bonus, Store, StorePhone
+from .models import Region, TelegramUser, UserSumma, VerifyPhone, InfoPhone, Info, Bonus, Store, StorePhone
 
 
 class StorePhoneSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class PhoneSerializer(serializers.Serializer):
 
 class UserPointSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserPoint
+        model = UserSumma
         fields = ['chat_id']
 
     chat_id = serializers.IntegerField()

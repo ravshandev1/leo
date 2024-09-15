@@ -1,7 +1,7 @@
 from rest_framework import generics, response
 from .serializers import RegionSerializer, TelegramUserSerializer, UserSerializer, UserPointSerializer, PhoneSerializer, \
     VerifyPhoneSerializer, InfoSerializer, StoreSerializer
-from .models import TelegramUser, Region, Bonus, UserPoint, VerifyPhone, Info, Store
+from .models import TelegramUser, Region, Bonus, UserSumma, VerifyPhone, Info, Store
 from .utils import send_verification_code
 from random import randint
 
@@ -36,7 +36,7 @@ class CheckCodeView(generics.GenericAPIView):
             return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!",
                                       "message_ru": "Такого кода не существует!"},
                                      status=404)
-        if UserPoint.objects.filter(bonus__code=kwargs['code']).first():
+        if UserSumma.objects.filter(bonus__code=kwargs['code']).first():
             return response.Response({"success": False, "message_uz": "Bu code avval foydalanilgan!",
                                       "message_ru": "Этот код использовался ранее!"},
                                      status=404)
@@ -46,12 +46,12 @@ class CheckCodeView(generics.GenericAPIView):
         user = TelegramUser.objects.filter(chat_id=self.request.data['chat_id']).first()
         bonus = Bonus.objects.get(code=kwargs['code'])
         if bonus:
-            user.point += bonus.point
+            user.summa += bonus.summa
             user.save()
-            UserPoint.objects.create(user_id=user.id, bonus_id=bonus.id)
+            UserSumma.objects.create(user_id=user.id, bonus_id=bonus.id)
             return response.Response({"success": True,
-                                      "message_uz": f"Hisobingizga {bonus.point} ball qo'shildi!\nBu ball 1 yil davomida amal qiladi\nAgar balldan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
-                                      "message_ru": f"{bonus.point} баллов добавлены к вашему счету!\n этот балл действителен в течение 1 года\nпесли вы не используете балл, он исчезнет через 1 год!"})
+                                      "message_uz": f"Hisobingizga {bonus.summa} so'm qo'shildi!\nBu so'm 1 yil davomida amal qiladi\nAgar so'mdan foydalanmasangiz 1 yildan so'ng o'chib ketadi!",
+                                      "message_ru": f"{bonus.summa} сум добавлены к вашему счету!\n этот сум действителен в течение 1 года\nесли вы не используете сум, он исчезнет через 1 год!"})
         return response.Response(
             {"success": False, "message_uz": "Bonus code mavjud emas", "message_ru": "Бонусный код недоступен"},
             status=404)

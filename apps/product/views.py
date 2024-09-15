@@ -59,6 +59,8 @@ class OrderView(generics.GenericAPIView):
             "parse_mode": "HTML"
         }
         post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+        for i in user.carts.all():
+            i.delete()
         return response.Response({'success': True})
 
 

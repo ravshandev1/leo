@@ -17,7 +17,7 @@ SECRET_KEY = ENV.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DEBUG') == "1"
 BASE_URL = ENV.get('BASE_URL')
-ALLOWED_HOSTS = ['leobonus.uz', 'localhost']
+ALLOWED_HOSTS = ['localhost']
 SMS_EMAIL = ENV.get('SMS_EMAIL')
 SMS_PASSWORD = ENV.get('SMS_PASSWORD')
 BOT_TOKEN = ENV.get('BOT_TOKEN')
@@ -131,7 +131,6 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

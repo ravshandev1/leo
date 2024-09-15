@@ -1,12 +1,12 @@
 from django.db import models
 from django.conf import settings
 from user.models import Bonus, TelegramUser, Store
+from django import forms
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, verbose_name="Имя")
     icon = models.ImageField(upload_to='categories/')
-    created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def icon_url(self):
@@ -14,10 +14,13 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name_plural = 'Категории'
+        verbose_name = 'Категория'
 
 
 class SubCategory(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, verbose_name="Имя")
     category = models.ForeignKey(Category, models.CASCADE, 'sub_categories')
 
     def __str__(self):
@@ -25,22 +28,36 @@ class SubCategory(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(SubCategory, models.CASCADE, 'products')
-    name = models.CharField(max_length=250, unique=True)
-    bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products',
-                                 limit_choices_to={'has_product': False})
-    price = models.IntegerField()
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    category = models.ForeignKey(SubCategory, models.CASCADE, 'products', verbose_name="Категория")
+    name = models.CharField(max_length=250, unique=True, verbose_name="Имя")
+    bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products', verbose_name="Бонус")
+    price = models.IntegerField(verbose_name="Цена")
+    description = models.TextField(verbose_name="Описание")
 
     def __str__(self):
         return self.name
+    class Meta:
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.bonus.has_product is False:
-            self.bonus.has_product = True
-            self.bonus.save()
+
+class ProductAdminForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['category', 'name', 'bonus', 'price', 'description']
+
+    def __init__(self, *args, **kwargs):
+        # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+        super().__init__(*args, **kwargs)
+        # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+
+        if 'bonus' in self.fields:
+            if self.instance and self.instance.pk:
+        #         # Agar yangilanayotgan bo'lsa, bonusni readonly qiling
+                self.fields['bonus'].widget.attrs['readonly'] = True
+            else:
+        #         # Agar mahsulot yaratilayotgan bo'lsa, bonus querysetini filtrlang
+                self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
 
 
 class ProductImage(models.Model):
@@ -56,15 +73,18 @@ class ProductImage(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(TelegramUser, models.CASCADE, 'orders')
-    product = models.ForeignKey(Product, models.CASCADE, 'orders')
-    count = models.IntegerField(default=1)
-    total = models.IntegerField(default=1)
-    store = models.ForeignKey(Store, models.CASCADE, 'orders')
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(TelegramUser, models.CASCADE, 'orders', verbose_name="Пользователь")
+    product = models.ForeignKey(Product, models.CASCADE, 'orders', verbose_name="Продукт")
+    count = models.IntegerField(default=1, verbose_name="Количество")
+    total = models.IntegerField(default=1, verbose_name="общая сумма")
+    store = models.ForeignKey(Store, models.CASCADE, 'orders', verbose_name="Магазин")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Созданный на")
 
     def __str__(self):
         return self.user
+    class Meta:
+        verbose_name_plural = 'Заказы'
+        verbose_name = 'Заказ'
 
 
 class Cart(models.Model):
