@@ -55,7 +55,7 @@ class TelegramUser(models.Model):
     name = models.CharField(max_length=120, verbose_name="Имя")
     chat_id = models.BigIntegerField(unique=True)
     phone = models.CharField(max_length=100, verbose_name="Телефон")
-    region = models.ForeignKey(Region, models.SET_NULL, null=True, blank=True, verbose_name="Регион")
+    region = models.ManyToManyField(Region, models.SET_NULL, null=True, blank=True, verbose_name="Регион")
     lang = models.CharField(max_length=2, verbose_name="Язык")
     summa = models.IntegerField(default=0, verbose_name="Сумма")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Созданный на")

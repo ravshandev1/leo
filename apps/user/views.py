@@ -24,7 +24,7 @@ class InfoView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         obj = Info.objects.first()
-        serializer = InfoSerializer(obj)
+        serializer = self.serializer_class(obj)
         return response.Response(serializer.data)
 
 
@@ -32,7 +32,7 @@ class CheckCodeView(generics.GenericAPIView):
     serializer_class = UserPointSerializer
 
     def get(self, request, *args, **kwargs):
-        if not Bonus.objects.filter(code=kwargs['code']).first():
+        if not Bonus.objects.filter(code=self.kwargs['code']).first():
             return response.Response({"success": False, "message_uz": "Bunday code mavjud emas!",
                                       "message_ru": "Такого кода не существует!"},
                                      status=404)
@@ -62,7 +62,6 @@ class SendCodeView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         code = str(randint(10000, 99999))
-        code = "77777"
         phone = self.request.data['phone']
         send_verification_code(phone, code)
         VerifyPhone.objects.create(phone=phone, code=code)
@@ -88,7 +87,7 @@ class UserCheckView(generics.GenericAPIView):
     serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):
-        obj = TelegramUser.objects.filter(chat_id=kwargs['chat_id']).first()
+        obj = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
         if not obj:
             return response.Response({"success": False, "message": "User not found!"}, status=404)
         return response.Response({"success": True, "message": "User found!"})
@@ -98,7 +97,7 @@ class TelegramUserView(generics.GenericAPIView):
     serializer_class = TelegramUserSerializer
 
     def get(self, request, *args, **kwargs):
-        obj = TelegramUser.objects.filter(chat_id=kwargs['chat_id']).first()
+        obj = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
         if not obj:
             return response.Response({'success': False, 'message': 'User not found!'}, status=404)
         serializer = TelegramUserSerializer(obj).data
