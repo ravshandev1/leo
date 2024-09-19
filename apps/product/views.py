@@ -1,13 +1,13 @@
 from pytz import timezone
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Category, Product, Order, Cart, OrderProduct
+from .models import Category, Product, Order, Cart
 from user.models import TelegramUser, Store
 from requests import post
 from django.conf import settings
 import json
 from rest_framework import generics, response
-from .serializers import ProductSerializer, CategorySerializer, CartSerializer, OrderSerializer
+from .serializers import ProductSerializer, CategorySerializer, CartSerializer, OrderSerializer, OrderProductSerializer
 
 
 class OrderView(generics.GenericAPIView):
@@ -88,6 +88,10 @@ class ProductDetailView(generics.RetrieveAPIView):
 
 class CartListView(generics.ListAPIView):
     serializer_class = CartSerializer
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CartSerializer
+        return OrderProductSerializer
 
     def get_queryset(self):
         return Cart.objects.filter(user__chat_id=self.kwargs['chat_id'])
