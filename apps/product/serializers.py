@@ -58,4 +58,4 @@ class CartSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
-        return obj.product.images.first().url
+        return obj.product.images.first().image_url
