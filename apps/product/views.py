@@ -1,3 +1,5 @@
+from itertools import product
+
 from pytz import timezone
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -98,7 +100,7 @@ class CartListView(generics.ListAPIView):
 
     def post(self, request, *args, **kwargs):
         user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
-        Cart.objects.create(user=user, product_id=self.request.data['product'], count=self.request.data['count'])
+        Cart.objects.create(user_id=user.id, product_id=self.request.data['product'], count=int(self.request.data['count']))
         return response.Response({'success': True})
 
 

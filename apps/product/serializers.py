@@ -54,7 +54,7 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['name', 'image', 'price', 'count']
 
     name = serializers.CharField(source='product.name')
-    price = serializers.CharField(source='price.name')
+    price = serializers.CharField(source='product.price')
     image = serializers.SerializerMethodField()
 
     def get_image(self, obj):
