@@ -58,8 +58,9 @@ class ProductSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['name', 'image', 'price', 'count']
+        fields = ['id', 'name', 'image', 'price', 'count']
 
+    id = serializers.CharField(source='product.id')
     name = serializers.CharField(source='product.name')
     price = serializers.CharField(source='product.price')
     image = serializers.SerializerMethodField()
