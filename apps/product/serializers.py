@@ -43,7 +43,10 @@ class ProductSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = ['name', 'price', 'count']
+        fields = ['name', 'image', 'price', 'count']
 
     name = serializers.CharField(source='product.name')
     price = serializers.CharField(source='price.name')
+    image = serializers.SerializerMethodField()
+    def get_image(self, obj):
+        return obj.product.images.first().url

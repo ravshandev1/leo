@@ -100,17 +100,17 @@ def categories_view(req):
         cart = "Savatcham"
         for i in qs:
             subs = list()
-            for j in i.sub_categories.all:
+            for j in i.sub_categories.all():
                 subs.append({'id': j.id, 'name': j.name_uz})
-            ls.append({'name': i.name_uz, 'icon': i.icon, 'subs': subs})
+            ls.append({'id': i.id, 'name': i.name_uz, 'icon': i.icon, 'subs': subs})
     elif lang == "ru":
         title = "Каталог"
         cart = "Корзина"
         for i in qs:
             subs = list()
-            for j in i.sub_categories.all:
+            for j in i.sub_categories.all():
                 subs.append({'id': j.id, 'name': j.name_ru})
-            ls.append({'name': i.name_ru, 'icon': i.icon, 'subs': subs})
+            ls.append({'id': i.id, 'name': i.name_ru, 'icon': i.icon, 'subs': subs})
     return render(req, 'categories.html', {'qs': ls, 'title': title, 'lang': lang, 'chat_id': chat_id, 'cart': cart})
 
 
@@ -150,7 +150,7 @@ def product_detail_view(req, pk):
     data = dict()
     if lang == "uz":
         overall = "Jami: "
-        you_got = f"Sizda {user.point} ball mavjud"
+        you_got = f"Sizda {user.summa} ball mavjud"
         order_btn = "Buyurtma berish"
         you_cant = "Sizda ball yetarli emas"
         data['name'] = obj.name_uz
@@ -160,7 +160,7 @@ def product_detail_view(req, pk):
         data['description'] = obj.description_uz
     elif lang == "ru":
         overall = "Итого: "
-        you_got = f"У вас есть {user.point} баллов"
+        you_got = f"У вас есть {user.summa} баллов"
         order_btn = "Заказать"
         you_cant = "У вас недостаточно баллов"
         data['name'] = obj.name_ru
@@ -171,8 +171,7 @@ def product_detail_view(req, pk):
     data['id'] = obj.id
     return render(req, 'product-detail.html',
                   {'you_cant': you_cant, 'order_btn': order_btn, 'overall': overall, 'you_got': you_got, 'obj': data,
-                   'lang': lang,
-                   'chat_id': chat_id, 'point': user.point})
+                   'lang': lang, 'chat_id': chat_id, 'point': user.summa})
 
 
 def order_view(req, pk):
