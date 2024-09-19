@@ -17,57 +17,42 @@ class OrderView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
+        if not user:
+            return response.Response({'error': 'User not found'}, status=404)
         data = self.request.data
-        data['user'] = user
-        serializer = self.serializer_class(data=data)
+        data['user'] = user.id
+        serializer = OrderSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
-        user.point -= order.total
+        user.summa -= order.total
         user.save()
         products_uz = ""
         products_ru = ""
         for i in order.products.all():
-            products_uz += f"Mahsulot: {i.product.name_uz}\n"
-            products_uz += f"Soni: {i.count}\n"
-            products_uz += f"Narxi: {i.product.price}\n"
-            products_ru += f"Продукт: {i.product.name_ru}\n"
-            products_ru += f"Количество: {i.count}\n"
-            products_ru += f"Стоимость: {i.product.price}\n"
-        txt = f"Foydalanuvchi: {user.phone}\n"
-        txt += f"Viloyat: {order.store.region.name_uz}\n"
-        txt += f"Mahsulotlar: \n{products_uz}"
-        txt += f"Dukon: {order.store.name_uz}\n"
-        txt += f"Buyurtma vaqti: {order.created_at.astimezone(tz=timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')}"
+            products_uz += f"Mahsulot: {i.product.name_uz}\nSoni: {i.count}\nNarxi: {i.product.price} so'm\n"
+            products_ru += f"Продукт: {i.product.name_ru}\nКоличество: {i.count}\nСтоимость: {i.product.price}Сум\n"
+        txt = f"Foydalanuvchi: {user.phone}\nViloyat: {order.store.region.name_uz}\nMahsulotlar: \n{products_uz}"
+        txt += f"Dukon: {order.store.name_uz}\nBuyurtma vaqti: {order.created_at.astimezone(tz=timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')}"
         payload = {
             "chat_id": settings.GROUP_ID,
             "text": txt,
             "parse_mode": "HTML"
         }
-        post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
-        txt = ""
+        telegram_response = post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
+        if telegram_response.status_code != 200:
+            return response.Response({'error': 'Failed to send message to Telegram'}, status=500)
         if user.lang == "uz":
-            txt += f"Mahsulotlar: \n{products_uz}"
-            txt += f"Dukon nomi: {order.store.name_uz}\n"
-            txt += f"Viloyat: {order.store.region.name_uz}\n"
-            txt += f"Narxi: {order.product.price}\n"
-            txt += "5 kundan so'ng olishingiz mumkin\n"
-            txt += f"Jami: {order.total}\n"
-            txt += f"Telefonlar: {[i.phone for i in order.store.phones.all()]}\n"
+            txt = f"Mahsulotlar: \n{products_uz}Dukon nomi: {order.store.name_uz}\nViloyat: {order.store.region.name_uz}\nJami: {order.total} so'm\n5 kundan so'ng olishingiz mumkin\nTelefonlar: {[i.phone for i in order.store.phones.all()]}\n"
         elif user.lang == "ru":
-            txt += f"Продукты: \n{products_ru}\n"
-            txt += f"Название магазина: {order.store.name_ru}"
-            txt += f"Региональный: {order.store.region.name_ru}"
-            txt += "Вы можете получить его через 5 дней\n"
-            txt += f"Итого: {order.total}"
-            txt += f"Телефоны: {[i.phone for i in order.store.phones.all()]}\n"
+            txt = f"Продукты: \n{products_ru}Название магазина: {order.store.name_ru}\nРегион: {order.store.region.name_ru}\nВы можете получить его через 5 дней\nИтого: {order.total} Сум\nТелефоны: {[i.phone for i in order.store.phones.all()]}\n"
+
         payload = {
             "chat_id": user.chat_id,
             "text": txt,
             "parse_mode": "HTML"
         }
         post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
-        for i in user.carts.all():
-            i.delete()
+        user.carts.all().delete()
         return response.Response({'success': True})
 
 

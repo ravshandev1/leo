@@ -9,12 +9,19 @@ class OrderProductSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['products', 'store', 'total']
-
     products = OrderProductSerializer(many=True)
 
+    class Meta:
+        model = Order
+        fields = ['user', 'products', 'store', 'total']
+
+    def create(self, validated_data):
+        products_data = validated_data.pop('products')
+        user = validated_data.get('user')
+        order = Order.objects.create(user_id=user.id, **validated_data)
+        for product_data in products_data:
+            OrderProduct.objects.create(order=order, **product_data)
+        return order
 
 class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
