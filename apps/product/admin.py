@@ -5,7 +5,7 @@ from .translations import CustomAdmin, StackedAdmin
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'product', 'count', 'store', 'created_at']
+    list_display = ['user', 'store', 'created_at']
     list_filter = ['created_at', 'store']
 
 
