@@ -1,11 +1,19 @@
 from rest_framework import serializers
-from .models import Category, SubCategory, Product, ProductImage, Cart, Order
+from .models import Category, SubCategory, Product, ProductImage, Cart, Order, OrderProduct
+
+
+class OrderProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderProduct
+        fields = ['product', 'count']
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['product', 'count', 'store', 'total']
+        fields = ['products', 'store', 'total']
+
+    products = OrderProductSerializer(many=True)
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
@@ -48,5 +56,6 @@ class CartSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='product.name')
     price = serializers.CharField(source='price.name')
     image = serializers.SerializerMethodField()
+
     def get_image(self, obj):
         return obj.product.images.first().url

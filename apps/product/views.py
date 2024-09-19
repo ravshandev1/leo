@@ -1,7 +1,7 @@
 from pytz import timezone
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Category, Product, Order, Cart
+from .models import Category, Product, Order, Cart, OrderProduct
 from user.models import TelegramUser, Store
 from requests import post
 from django.conf import settings
@@ -22,11 +22,19 @@ class OrderView(generics.GenericAPIView):
         order = serializer.save()
         user.point -= order.total
         user.save()
+        products_uz = ""
+        products_ru = ""
+        for i in order.products.all():
+            products_uz += f"Mahsulot: {i.product.name_uz}\n"
+            products_uz += f"Soni: {i.count}\n"
+            products_uz += f"Narxi: {i.product.price}\n"
+            products_ru += f"Продукт: {i.product.name_ru}\n"
+            products_ru += f"Количество: {i.count}\n"
+            products_ru += f"Стоимость: {i.product.price}\n"
         txt = f"Foydalanuvchi: {user.phone}\n"
-        txt += f"Mahsulot: {order.product.name_uz}\n"
         txt += f"Viloyat: {order.store.region.name_uz}\n"
+        txt += f"Mahsulotlar: \n{products_uz}"
         txt += f"Dukon: {order.store.name_uz}\n"
-        txt += f"Soni: {order.count}\n"
         txt += f"Buyurtma vaqti: {order.created_at.astimezone(tz=timezone('Asia/Tashkent')).strftime('%d-%m-%Y %H:%M')}"
         payload = {
             "chat_id": settings.GROUP_ID,
@@ -36,20 +44,17 @@ class OrderView(generics.GenericAPIView):
         post(f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage", json=payload)
         txt = ""
         if user.lang == "uz":
-            txt += f"Mahsulot: {order.product.name_uz}\n"
+            txt += f"Mahsulotlar: \n{products_uz}"
             txt += f"Dukon nomi: {order.store.name_uz}\n"
             txt += f"Viloyat: {order.store.region.name_uz}\n"
-            txt += f"Soni: {order.count}\n"
             txt += f"Narxi: {order.product.price}\n"
             txt += "5 kundan so'ng olishingiz mumkin\n"
             txt += f"Jami: {order.total}\n"
             txt += f"Telefonlar: {[i.phone for i in order.store.phones.all()]}\n"
         elif user.lang == "ru":
-            txt += f"Продукт: {order.product.name_ru}\n"
+            txt += f"Продукты: \n{products_ru}\n"
             txt += f"Название магазина: {order.store.name_ru}"
             txt += f"Региональный: {order.store.region.name_ru}"
-            txt += f"Количество: {order.count}\n"
-            txt += f"Стоимость: {order.product.price}\n"
             txt += "Вы можете получить его через 5 дней\n"
             txt += f"Итого: {order.total}"
             txt += f"Телефоны: {[i.phone for i in order.store.phones.all()]}\n"
@@ -86,6 +91,11 @@ class CartListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Cart.objects.filter(user__chat_id=self.kwargs['chat_id'])
+
+    def post(self, request, *args, **kwargs):
+        user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
+        Cart.objects.create(user=user, product_id=self.request.data['product'], count=self.request.data['count'])
+        return response.Response({'success': True})
 
 
 def categories_view(req):

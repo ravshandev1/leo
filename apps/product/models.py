@@ -14,6 +14,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
     class Meta:
         verbose_name_plural = 'Категории'
         verbose_name = 'Категория'
@@ -36,6 +37,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
@@ -53,10 +55,10 @@ class ProductAdminForm(forms.ModelForm):
 
         if 'bonus' in self.fields:
             if self.instance and self.instance.pk:
-        #         # Agar yangilanayotgan bo'lsa, bonusni readonly qiling
+                #         # Agar yangilanayotgan bo'lsa, bonusni readonly qiling
                 self.fields['bonus'].widget.attrs['readonly'] = True
             else:
-        #         # Agar mahsulot yaratilayotgan bo'lsa, bonus querysetini filtrlang
+                #         # Agar mahsulot yaratilayotgan bo'lsa, bonus querysetini filtrlang
                 self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
 
 
@@ -74,17 +76,25 @@ class ProductImage(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(TelegramUser, models.CASCADE, 'orders', verbose_name="Пользователь")
-    product = models.ForeignKey(Product, models.CASCADE, 'orders', verbose_name="Продукт")
-    count = models.IntegerField(default=1, verbose_name="Количество")
     total = models.IntegerField(default=1, verbose_name="общая сумма")
     store = models.ForeignKey(Store, models.CASCADE, 'orders', verbose_name="Магазин")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Созданный на")
 
     def __str__(self):
         return self.user
+
     class Meta:
         verbose_name_plural = 'Заказы'
         verbose_name = 'Заказ'
+
+
+class OrderProduct(models.Model):
+    order = models.ForeignKey(Order, models.CASCADE, 'products')
+    product = models.ForeignKey(Product, models.CASCADE, 'orders', verbose_name="Продукт")
+    count = models.IntegerField(default=1, verbose_name="Количество")
+
+    def __str__(self):
+        return self.product.name
 
 
 class Cart(models.Model):
