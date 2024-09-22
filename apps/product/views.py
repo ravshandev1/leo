@@ -65,6 +65,7 @@ class ProductListView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
         data = list()
+
         for i in Product.objects.filter(category_id=self.kwargs['subcategory_id']):
             d = ProductSerializer(i).data
             if Cart.objects.filter(product_id=i, user_id=user.id).exists():
