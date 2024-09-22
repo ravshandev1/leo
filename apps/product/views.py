@@ -1,3 +1,5 @@
+from itertools import product
+
 from pytz import timezone
 from .models import Category, Product, Cart
 from user.models import TelegramUser
@@ -82,7 +84,7 @@ class ProductDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
         serializer = ProductSerializer(self.get_object()).data
-        if Cart.objects.filter(product_id=user.id, user_id=user.id).exists():
+        if Cart.objects.filter(product_id=self.kwargs['pk'], user_id=user.id).exists():
             serializer['has_in_cart'] = True
         else:
             serializer['has_in_cart'] = False
