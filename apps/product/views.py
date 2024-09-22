@@ -68,7 +68,7 @@ class ProductListView(generics.GenericAPIView):
 
         for i in Product.objects.filter(category_id=self.kwargs['subcategory_id']):
             d = ProductSerializer(i).data
-            if Cart.objects.filter(product_id=i, user_id=user.id).exists():
+            if Cart.objects.filter(product_id=i.id, user_id=user.id).exists():
                 d['has_in_cart'] = True
             d['has_in_cart'] = False
             data.append(d)
