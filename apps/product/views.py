@@ -79,6 +79,15 @@ class ProductDetailView(generics.RetrieveAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        user = TelegramUser.objects.filter(chat_id=self.kwargs['chat_id']).first()
+        serializer = ProductSerializer(self.get_object()).data
+        if Cart.objects.filter(product_id=user.id, user_id=user.id).exists():
+            serializer['has_in_cart'] = True
+        else:
+            serializer['has_in_cart'] = False
+        return response.Response(serializer)
+
 
 class CartListView(generics.ListAPIView):
     serializer_class = CartSerializer
