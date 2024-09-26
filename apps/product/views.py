@@ -1,5 +1,3 @@
-from itertools import product
-
 from pytz import timezone
 from .models import Category, Product, Cart
 from user.models import TelegramUser
@@ -59,6 +57,16 @@ class OrderView(generics.GenericAPIView):
 class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.prefetch_related('sub_categories').all()
+        serializer = CategorySerializer(categories, many=True)
+        data = serializer.data
+        for category in data:
+            sub_categories = category['sub_categories']
+            filtered_sub_categories = [sub for sub in sub_categories if sub['parent'] is None]
+            category['sub_categories'] = filtered_sub_categories
+        return response.Response(data)
 
 
 class ProductListView(generics.GenericAPIView):

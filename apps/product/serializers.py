@@ -23,10 +23,20 @@ class OrderSerializer(serializers.ModelSerializer):
             OrderProduct.objects.create(order=order, **product_data)
         return order
 
-class SubCategorySerializer(serializers.ModelSerializer):
+
+class ChildCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
         fields = ['id', 'name']
+
+
+class SubCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SubCategory
+        fields = ['id', 'name', 'icon', 'children', 'parent']
+
+    children = ChildCategorySerializer(many=True)
+    icon = serializers.CharField(source='icon_url')
 
 
 class CategorySerializer(serializers.ModelSerializer):

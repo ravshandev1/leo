@@ -22,10 +22,18 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=250, verbose_name="Имя")
+    parent = models.ForeignKey('self', models.CASCADE, 'children', null=True, blank=True, limit_choices_to={'parent': None})
+    icon = models.ImageField(upload_to='subcategories/', null=True, blank=True)
     category = models.ForeignKey(Category, models.CASCADE, 'sub_categories')
 
     def __str__(self):
         return self.name_ru
+
+    @property
+    def icon_url(self):
+        if self.icon:
+            return f"{settings.BASE_URL}{self.icon.url}"
+        return None
 
 
 class Product(models.Model):
