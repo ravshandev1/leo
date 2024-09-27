@@ -1,4 +1,5 @@
 from django.db import models
+from random import randint
 
 
 class Region(models.Model):
@@ -6,6 +7,7 @@ class Region(models.Model):
 
     def __str__(self):
         return self.name
+
     class Meta:
         verbose_name = "Регион"
         verbose_name_plural = 'Регионы'
@@ -16,6 +18,7 @@ class Info(models.Model):
 
     def __str__(self):
         return self.link
+
     class Meta:
         verbose_name = "Связаться с нами"
         verbose_name_plural = "Связаться с нами"
@@ -84,9 +87,18 @@ class Bonus(models.Model):
 
     def __str__(self):
         return self.code
+
     class Meta:
         verbose_name = 'Бонус'
         verbose_name_plural = 'Бонус'
+
+    def save(self, *args, **kwargs):
+        if not Bonus.objects.filter(id=self.pk).exists():
+            code = self.code[::-1]
+            random_number = f'{randint(1000, 9999):04}'
+            new_code = code.replace('0000', random_number)
+            self.code = new_code[::-1]
+        super().save()
 
 
 class UserSumma(models.Model):

@@ -109,7 +109,7 @@ class TelegramUserView(generics.GenericAPIView):
         obj = TelegramUser.objects.filter(chat_id=kwargs['chat_id']).first()
         if not obj:
             return response.Response({'success': False, 'message': 'User not found!'}, status=404)
-        serializer = TelegramUserSerializer(instance=obj, data=self.request.data)
+        serializer = TelegramUserSerializer(instance=obj, data=self.request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Response(serializer.data)
