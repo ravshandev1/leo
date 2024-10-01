@@ -38,7 +38,7 @@ class SubCategory(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(SubCategory, models.CASCADE, 'products', verbose_name="Категория")
-    name = models.CharField(max_length=250, unique=True, verbose_name="Имя")
+    name = models.CharField(max_length=250, verbose_name="Имя")
     bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products', verbose_name="Бонус")
     price = models.IntegerField(verbose_name="Цена")
     description = models.TextField(verbose_name="Описание")
