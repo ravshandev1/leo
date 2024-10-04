@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
-from user.models import Bonus, TelegramUser, Store
-from django import forms
+from user.models import TelegramUser, Store
+from celery import shared_task
+from time import sleep
 
 
 class Category(models.Model):
@@ -22,7 +23,8 @@ class Category(models.Model):
 
 class SubCategory(models.Model):
     name = models.CharField(max_length=250, verbose_name="Имя")
-    parent = models.ForeignKey('self', models.CASCADE, 'children', null=True, blank=True, limit_choices_to={'parent': None})
+    parent = models.ForeignKey('self', models.CASCADE, 'children', null=True, blank=True,
+                               limit_choices_to={'parent': None})
     icon = models.ImageField(upload_to='subcategories/', null=True, blank=True)
     category = models.ForeignKey(Category, models.CASCADE, 'sub_categories')
 
@@ -31,15 +33,12 @@ class SubCategory(models.Model):
 
     @property
     def icon_url(self):
-        if self.icon:
-            return f"{settings.BASE_URL}{self.icon.url}"
-        return None
+        return f"{settings.BASE_URL}{self.icon.url}" if self.icon else None
 
 
 class Product(models.Model):
     category = models.ForeignKey(SubCategory, models.CASCADE, 'products', verbose_name="Категория")
     name = models.CharField(max_length=250, verbose_name="Имя")
-    bonus = models.OneToOneField(Bonus, models.CASCADE, related_name='products', verbose_name="Бонус")
     price = models.IntegerField(verbose_name="Цена")
     description = models.TextField(verbose_name="Описание")
 
@@ -51,23 +50,57 @@ class Product(models.Model):
         verbose_name_plural = 'Продукты'
 
 
-class ProductAdminForm(forms.ModelForm):
+class Bonus(models.Model):
+    product = models.ForeignKey(Product, models.CASCADE, 'bonuses')
+    code = models.CharField(max_length=100, unique=True, verbose_name="Код")
+    summa = models.IntegerField(default=1, verbose_name="Сумма")
+
+    def __str__(self):
+        return self.code
+
     class Meta:
-        model = Product
-        fields = ['category', 'name', 'bonus', 'price', 'description']
+        verbose_name = 'Бонус'
+        verbose_name_plural = 'Бонус'
 
-    def __init__(self, *args, **kwargs):
-        # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
-        super().__init__(*args, **kwargs)
-        # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+    def save(self, *args, **kwargs):
+        if not Bonus.objects.filter(id=self.pk).exists():
+            generate_bonuses.delay(self.pk)
+        super().save()
 
-        if 'bonus' in self.fields:
-            if self.instance and self.instance.pk:
-                #         # Agar yangilanayotgan bo'lsa, bonusni readonly qiling
-                self.fields['bonus'].widget.attrs['readonly'] = True
-            else:
-                #         # Agar mahsulot yaratilayotgan bo'lsa, bonus querysetini filtrlang
-                self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+@shared_task
+def generate_bonuses(pk: int):
+    sleep(10)
+    bonus = Bonus.objects.get(pk=pk)
+    prefix = bonus.code[:-4]
+    for i in range(1, 10000):
+        code = f"{prefix}{str(i).zfill(4)}"
+        Bonus.objects.create(code=code, product_id=bonus.product.id, summa=bonus.summa)
+    return "The Bonuses have created!"
+
+class UserSumma(models.Model):
+    user = models.ForeignKey(TelegramUser, models.CASCADE, 'points')
+    bonus = models.ForeignKey(Bonus, models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.name
+
+
+# class ProductAdminForm(forms.ModelForm):
+#     class Meta:
+#         model = Product
+#         fields = ['category', 'name', 'bonus', 'price', 'description']
+#
+#     def __init__(self, *args, **kwargs):
+#         # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+#         super().__init__(*args, **kwargs)
+#         # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
+#
+#         if 'bonus' in self.fields:
+#             if self.instance and self.instance.pk:
+#                 self.fields['bonus'].widget.attrs['readonly'] = True
+#             else:
+#                 self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
 
 
 class ProductImage(models.Model):

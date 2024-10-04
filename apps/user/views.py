@@ -1,7 +1,8 @@
 from rest_framework import generics, response
-from .serializers import RegionSerializer, TelegramUserSerializer, UserSerializer, UserPointSerializer, PhoneSerializer, \
+from .serializers import RegionSerializer, TelegramUserSerializer, UserSerializer, PhoneSerializer, \
     VerifyPhoneSerializer, InfoSerializer, StoreSerializer
-from .models import TelegramUser, Region, Bonus, UserSumma, VerifyPhone, Info, Store
+from .models import TelegramUser, Region, VerifyPhone, Info, Store
+from product.models import Bonus, UserSumma
 from .utils import send_verification_code
 from random import randint
 
@@ -29,7 +30,6 @@ class InfoView(generics.GenericAPIView):
 
 
 class CheckCodeView(generics.GenericAPIView):
-    serializer_class = UserPointSerializer
 
     def get(self, request, *args, **kwargs):
         if not Bonus.objects.filter(code=self.kwargs['code']).first():

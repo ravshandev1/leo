@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage, Order, SubCategory, ProductAdminForm
+from .models import Category, Product, ProductImage, Order, SubCategory, Bonus, UserSumma
 from .translations import CustomAdmin, StackedAdmin
 
 
@@ -7,6 +7,12 @@ from .translations import CustomAdmin, StackedAdmin
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['user', 'store', 'created_at']
     list_filter = ['created_at', 'store']
+
+
+@admin.register(UserSumma)
+class UserSummaAdmin(admin.ModelAdmin):
+    list_display = ['user', 'bonus', 'created_at']
+    list_filter = ['created_at', 'user']
 
 
 class SubCategoryInline(StackedAdmin):
@@ -25,19 +31,12 @@ class ProductImageInline(admin.StackedInline):
     extra = 0
 
 
+class ProductBonusInline(admin.StackedInline):
+    model = Bonus
+    extra = 0
+
+
 @admin.register(Product)
 class ProductAdmin(CustomAdmin):
-    inlines = [ProductImageInline]
-    list_display = ['id', 'name', 'price', 'category', 'bonus']
-    form = ProductAdminForm
-
-    def save_model(self, request, obj, form, change):
-        if not change:  # Agar mahsulot yangilanayotgan bo'lsa
-            obj.bonus.has_product = True  # Bonusni mahsulot bilan bog'liq qilib belgilang
-            obj.bonus.save()
-        super().save_model(request, obj, form, change)
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj:  # Agar mahsulot yangilanayotgan bo'lsa, bonusni readonly qilamiz
-            return ['bonus']
-        return []
+    inlines = [ProductImageInline, ProductBonusInline]
+    list_display = ['id', 'name', 'price', 'category']

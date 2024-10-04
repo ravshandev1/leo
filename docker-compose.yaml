@@ -1,0 +1,27 @@
+version: "3"
+services:
+  django:
+    build:
+      context: .
+    restart: unless-stopped
+    container_name: leo_django
+    volumes:
+      - /home/ubuntu/leo/back/media:/app/media
+      - /home/ubuntu/leo/back/dotenv:/app/.env
+    ports:
+      - "8001:8000"
+  redis:
+    image: redis:alpine
+    container_name: leo_redis
+    restart: unless-stopped
+  celery:
+    restart: unless-stopped
+    container_name: leo_celery
+    build:
+      context: .
+      dockerfile: celery-dockerfile
+    volumes:
+      - /home/ubuntu/leo/back/dotenv:/app/.env
+    depends_on:
+      - django
+      - redis

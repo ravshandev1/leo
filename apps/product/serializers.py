@@ -61,8 +61,11 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'bonus', 'price', 'description', 'images']
 
-    bonus = serializers.CharField(source='bonus.summa')
-    images = ProductImageSerializer(many=True, read_only=True)
+    bonus = serializers.SerializerMethodField()
+    images = ProductImageSerializer(many=True)
+
+    def get_bonus(self, obj):
+        return obj.bonuses.first().summa
 
 
 class CartSerializer(serializers.ModelSerializer):

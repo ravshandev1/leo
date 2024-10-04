@@ -1,5 +1,4 @@
 from django.db import models
-from random import randint
 
 
 class Region(models.Model):
@@ -78,33 +77,3 @@ class VerifyPhone(models.Model):
 
     def __str__(self):
         return self.phone
-
-
-class Bonus(models.Model):
-    code = models.CharField(max_length=100, unique=True, verbose_name="Код")
-    summa = models.IntegerField(default=1, verbose_name="Сумма")
-    has_product = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.code
-
-    class Meta:
-        verbose_name = 'Бонус'
-        verbose_name_plural = 'Бонус'
-
-    def save(self, *args, **kwargs):
-        if not Bonus.objects.filter(id=self.pk).exists():
-            code = self.code[::-1]
-            random_number = f'{randint(1000, 9999):04}'
-            new_code = code.replace('0000', random_number)
-            self.code = new_code[::-1]
-        super().save()
-
-
-class UserSumma(models.Model):
-    user = models.ForeignKey(TelegramUser, models.CASCADE, 'points')
-    bonus = models.ForeignKey(Bonus, models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.user.name

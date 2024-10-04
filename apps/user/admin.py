@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Region, TelegramUser, VerifyPhone, Bonus, InfoPhone, Info, StorePhone, Store
+from .models import Region, TelegramUser, VerifyPhone, InfoPhone, Info, StorePhone, Store
 from .translations import CustomAdmin
 
 
@@ -39,9 +39,3 @@ class TelegramUserAdmin(admin.ModelAdmin):
 @admin.register(VerifyPhone)
 class VerifyPhoneAdmin(admin.ModelAdmin):
     list_display = ["phone", "code", "created_at"]
-
-
-@admin.register(Bonus)
-class BonusAdmin(admin.ModelAdmin):
-    list_display = ["code", "summa"]
-    exclude = ['has_product']
