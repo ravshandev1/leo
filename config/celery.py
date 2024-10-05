@@ -8,7 +8,9 @@ app = Celery('config')
 app.conf.enable_utc = False
 app.conf.update(timezone='Asia/Tashkent')
 app.conf.broker_url = f"redis://leo_redis:6379/0"
+# app.conf.broker_url = f"redis://redis:6379/0"
 app.conf.result_backend = f"redis://leo_redis:6379/0"
+# app.conf.result_backend = f"redis://redis:6379/0"
 app.conf.broker_connection_retry_on_startup = True
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()

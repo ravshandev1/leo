@@ -1,8 +1,8 @@
+from time import sleep
 from django.db import models
 from django.conf import settings
 from user.models import TelegramUser, Store
 from celery import shared_task
-from time import sleep
 
 
 class Category(models.Model):
@@ -64,18 +64,25 @@ class Bonus(models.Model):
 
     def save(self, *args, **kwargs):
         if not Bonus.objects.filter(id=self.pk).exists():
+            super().save(*args, **kwargs)
             generate_bonuses.delay(self.pk)
-        super().save()
+        else:
+            super().save()
+
 
 @shared_task
 def generate_bonuses(pk: int):
     sleep(10)
     bonus = Bonus.objects.get(pk=pk)
-    prefix = bonus.code[:-4]
+    bonuses = []
     for i in range(1, 10000):
-        code = f"{prefix}{str(i).zfill(4)}"
-        Bonus.objects.create(code=code, product_id=bonus.product.id, summa=bonus.summa)
-    return "The Bonuses have created!"
+        code = bonus.code[::-1]
+        random_number = f'{i:04}'
+        code = code.replace('0000', random_number[::-1], 1)[::-1]
+        bonuses.append(Bonus(code=code, product_id=bonus.product.id, summa=bonus.summa))
+    Bonus.objects.bulk_create(bonuses)
+    return "The Bonuses have been created!"
+
 
 class UserSumma(models.Model):
     user = models.ForeignKey(TelegramUser, models.CASCADE, 'points')
@@ -84,23 +91,6 @@ class UserSumma(models.Model):
 
     def __str__(self):
         return self.user.name
-
-
-# class ProductAdminForm(forms.ModelForm):
-#     class Meta:
-#         model = Product
-#         fields = ['category', 'name', 'bonus', 'price', 'description']
-#
-#     def __init__(self, *args, **kwargs):
-#         # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
-#         super().__init__(*args, **kwargs)
-#         # self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
-#
-#         if 'bonus' in self.fields:
-#             if self.instance and self.instance.pk:
-#                 self.fields['bonus'].widget.attrs['readonly'] = True
-#             else:
-#                 self.fields['bonus'].queryset = Bonus.objects.filter(has_product=False)
 
 
 class ProductImage(models.Model):

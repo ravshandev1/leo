@@ -44,7 +44,12 @@ INSTALLED_APPS = [
     'user',
     'product'
 ]
-
+# CELERY settings
+CELERY_BROKER_URL = 'redis://leo_redis:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Tashkent'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

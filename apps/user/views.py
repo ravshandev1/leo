@@ -30,6 +30,7 @@ class InfoView(generics.GenericAPIView):
 
 
 class CheckCodeView(generics.GenericAPIView):
+    serializer_class = PhoneSerializer
 
     def get(self, request, *args, **kwargs):
         if not Bonus.objects.filter(code=self.kwargs['code']).first():

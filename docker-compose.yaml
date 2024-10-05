@@ -10,6 +10,9 @@ services:
       - /home/ubuntu/leo/back/dotenv:/app/.env
     ports:
       - "8001:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://leo_redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://leo_redis:6379/0
   redis:
     image: redis:alpine
     container_name: leo_redis
