@@ -62,12 +62,12 @@ class Bonus(models.Model):
         verbose_name = 'Бонус'
         verbose_name_plural = 'Бонус'
 
-    def save(self, *args, **kwargs):
-        if not Bonus.objects.filter(id=self.pk).exists():
-            super().save(*args, **kwargs)
-            generate_bonuses.delay(self.pk)
-        else:
-            super().save()
+    # def save(self, *args, **kwargs):
+    #     if not Bonus.objects.filter(id=self.pk).exists():
+    #         super().save(*args, **kwargs)
+    #         generate_bonuses.delay(self.pk)
+    #     else:
+    #         super().save()
 
 
 @shared_task
@@ -86,7 +86,7 @@ def generate_bonuses(pk: int):
 
 class UserSumma(models.Model):
     user = models.ForeignKey(TelegramUser, models.CASCADE, 'points')
-    bonus = models.ForeignKey(Bonus, models.CASCADE)
+    code = models.CharField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

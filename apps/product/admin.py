@@ -11,7 +11,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(UserSumma)
 class UserSummaAdmin(admin.ModelAdmin):
-    list_display = ['user', 'bonus', 'created_at']
+    list_display = ['user', 'code', 'created_at']
     list_filter = ['created_at', 'user']
 
 
@@ -34,13 +34,6 @@ class ProductImageInline(admin.StackedInline):
 class ProductBonusInline(admin.StackedInline):
     model = Bonus
     extra = 0
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        first_bonus = qs.first()
-        if first_bonus:
-            return qs.filter(id=first_bonus.id)
-        return qs.none()
 
 
 @admin.register(Product)
