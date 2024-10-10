@@ -37,7 +37,12 @@ class ProductBonusInline(admin.StackedInline):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.first()
+        # Faqat birinchi bonusni qaytarish uchun:
+        first_bonus = qs.first()
+        if first_bonus:
+            # QuerySetga o'rash uchun: [first_bonus] orqali bir elementli ro'yxat qaytariladi
+            return qs.filter(pk=first_bonus.pk)
+        return qs.none()
 
 
 @admin.register(Product)
