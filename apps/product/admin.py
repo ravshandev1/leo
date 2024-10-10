@@ -35,6 +35,10 @@ class ProductBonusInline(admin.StackedInline):
     model = Bonus
     extra = 0
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.first()
+
 
 @admin.register(Product)
 class ProductAdmin(CustomAdmin):
