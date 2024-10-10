@@ -41,7 +41,7 @@ class ProductBonusInline(admin.StackedInline):
         first_bonus = qs.first()
         if first_bonus:
             # QuerySetga o'rash uchun: [first_bonus] orqali bir elementli ro'yxat qaytariladi
-            return qs.filter(pk=first_bonus.pk)
+            return qs.filter(id=first_bonus.id)
         return qs.none()
 
 
