@@ -65,7 +65,7 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
 
     def get_bonus(self, obj):
-        return obj.bonuses.first().summa
+        return obj.bonuses.first().summa if obj.bonuses.first() else 0
 
 
 class CartSerializer(serializers.ModelSerializer):
